@@ -1,105 +1,27 @@
-import React from 'react';
-import { Heart, Phone } from 'lucide-react';
-import { formatKisaanHelpline, kisaanHelplineTelHref } from '@/constants/contact';
+import { Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const Footer: React.FC = () => {
+export default function Footer() {
   return (
-    <footer className="bg-gray-50 dark:bg-gray-900 pt-10 pb-6">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center mb-4 gap-2">
-              <span className="text-primary text-xl font-bold flex items-center">
-                Gram<span className="text-primary-dark">Sahay</span>
-              </span>
+    <footer className="border-t border-white/5 py-12 bg-[#050505] text-white mt-auto w-full">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center">
+              <Shield className="w-4 h-4 text-black" />
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-              Empowering communities with technology to improve local governance and livelihood.
-            </p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm font-noto">
-              आपका समुदाय, आपकी आवाज़
-            </p>
+            <span className="text-lg font-bold text-white/80">GramSahay</span>
           </div>
-          
-          <div className="col-span-1">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">Features</h4>
-            <ul className="space-y-2">
-              <li><a href="/report" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Report Issue</a></li>
-              <li><a href="/community-map" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Community Map</a></li>
-              <li><a href="/assistant" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">AI Assistant</a></li>
-              <li><a href="/leaderboard" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Leaderboard</a></li>
-              <li><a href="/analytics" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Analytics</a></li>
-            </ul>
+          <div className="flex items-center gap-6 text-sm text-white/30">
+            <Link to="/sign-in" className="hover:text-yellow-400 transition-colors">Sign In</Link>
+            <a href="/#features" className="hover:text-yellow-400 transition-colors">Features</a>
+            <a href="/#how-it-works" className="hover:text-yellow-400 transition-colors">How It Works</a>
           </div>
-          
-          <div className="col-span-1">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">Resources</h4>
-            <ul className="space-y-2">
-              <li><a href="/government" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Government Schemes</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Community Guidelines</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Blog</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">FAQ</a></li>
-            </ul>
-          </div>
-          
-          <div className="col-span-1">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">
-              Contact us
-            </h4>
-            <div className="rounded-lg border border-primary/20 bg-primary/5 dark:bg-primary/10 p-4 mb-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary dark:text-primary/90 mb-1">
-                GramSahay helpline
-              </p>
-              <a
-                href={kisaanHelplineTelHref}
-                className="inline-flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary transition-colors"
-              >
-                <Phone className="h-5 w-5 shrink-0 text-primary" aria-hidden />
-                {formatKisaanHelpline()}
-              </a>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-noto">
-                टोल फ्री · Toll free
-              </p>
-            </div>
-            <ul className="space-y-2">
-              <li className="text-gray-600 dark:text-gray-400 text-sm">Email: info@gramsahay.org</li>
-              <li className="text-gray-600 dark:text-gray-400 text-sm">Address: New Delhi, India</li>
-            </ul>
-            <div className="mt-4">
-              <h5 className="text-sm font-bold mb-2">Download Our App</h5>
-              <div className="flex space-x-2">
-                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
-                  <span className="sr-only">Google Play</span>
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary">
-                  <span className="sr-only">App Store</span>
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M11.07,17.07H8.07V10.85H11.07V17.07M15.07,17.07H12.07V10.85H15.07V17.07M15.07,9.55H8.07V6.55H15.07V9.55Z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
-              &copy; {new Date().getFullYear()} GramSahay. All rights reserved.
-            </p>
-            <div className="flex items-center">
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                Made with <Heart size={14} className="inline text-red-500" /> for Indian Communities
-              </p>
-            </div>
+          <div className="text-sm text-white/20">
+            Built with ❤️ for Indian Communities · Powered by Google Gemini
           </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

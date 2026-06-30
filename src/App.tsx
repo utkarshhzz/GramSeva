@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider, useAuth } from '@/contexts/FirebaseAuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import Footer from '@/components/Footer';
 
 // Pages
 import LandingPage from '@/pages/LandingPage';
@@ -75,7 +76,10 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <LanguageProvider>
-          <AppRoutes />
+          <div className="flex flex-col min-h-screen w-full">
+            <AppRoutes />
+            <Footer />
+          </div>
           <Toaster />
         </LanguageProvider>
       </AuthProvider>

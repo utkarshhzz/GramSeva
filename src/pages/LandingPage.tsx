@@ -133,20 +133,23 @@ const testimonials = [
 // ── Main Component ────────────────────────────────────────────
 
 export default function LandingPage() {
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95]);
+  const { scrollY } = useScroll();
+  // Hero is 300vh. Reveal navbar after 200vh
+  const navY = useTransform(scrollY, [0, window.innerHeight * 2, window.innerHeight * 2.5], [-100, -100, 0]);
 
   return (
-    <div className="min-h-screen bg-[#06060a] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden">
       {/* ── Navigation ────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#06060a]/70 border-b border-white/5">
+      <motion.nav 
+        style={{ y: navY }}
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#050505]/80 border-b border-white/5"
+      >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-black" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-white/90">
               GramSahay
             </span>
           </Link>
@@ -167,13 +170,13 @@ export default function LandingPage() {
             </Link>
             <Link
               to="/sign-up"
-              className="text-sm bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 px-5 py-2.5 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-indigo-500/25"
+              className="text-sm bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 text-black hover:brightness-110 px-6 py-2.5 rounded-full font-bold transition-all shadow-[0_0_15px_rgba(234,179,8,0.3)] hover:shadow-[0_0_25px_rgba(234,179,8,0.5)]"
             >
               Get Started
             </Link>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* ── Hero Section (3D Cinematic) ──────────────────────────────── */}
       <HeroCanvas />
@@ -196,7 +199,7 @@ export default function LandingPage() {
                 transition={{ delay: i * 0.1 }}
                 className="text-center"
               >
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                <div className="text-3xl md:text-4xl font-bold text-yellow-500">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                 </div>
                 <div className="text-sm text-white/40 mt-1">{stat.label}</div>
@@ -215,7 +218,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <p className="text-indigo-400 text-sm font-medium mb-3 uppercase tracking-wider">Report Any Issue</p>
+            <p className="text-yellow-500 text-sm font-bold mb-3 uppercase tracking-widest">Report Any Issue</p>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                 Every Problem Has A Category
@@ -237,8 +240,8 @@ export default function LandingPage() {
                 whileHover={{ scale: 1.03, y: -4 }}
                 className="group relative p-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-white/10 backdrop-blur-sm transition-all cursor-pointer overflow-hidden"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-[0.06] transition-opacity`} />
-                <cat.icon className="w-8 h-8 text-white/60 group-hover:text-white/80 transition-colors mb-3" />
+                <div className={`absolute inset-0 bg-gradient-to-br from-yellow-500 to-yellow-700 opacity-0 group-hover:opacity-10 transition-opacity`} />
+                <cat.icon className="w-8 h-8 text-white/50 group-hover:text-yellow-400 transition-colors mb-3" />
                 <h3 className="font-semibold text-white/90 mb-1">{cat.label}</h3>
                 <p className="text-sm text-white/40">{cat.count} issues reported</p>
               </motion.div>
@@ -248,8 +251,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features Grid ─────────────────────────────── */}
-      <section id="features" className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/20 to-transparent" />
+      <section id="features" className="py-24 relative border-t border-white/5">
+        <div className="absolute inset-0 bg-[#050505]" />
         <div className="relative max-w-6xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -257,7 +260,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <p className="text-indigo-400 text-sm font-medium mb-3 uppercase tracking-wider">Platform Features</p>
+            <p className="text-yellow-500 text-sm font-bold mb-3 uppercase tracking-widest">Platform Features</p>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                 AI-Powered Community Action
@@ -277,10 +280,10 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -6 }}
-                className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-all"
+                className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-yellow-500/30 transition-all hover:bg-white/[0.04]"
               >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-6 h-6 text-white" />
+                <div className={`w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 group-hover:border-yellow-500/50 flex items-center justify-center mb-5 group-hover:scale-110 transition-all shadow-inner`}>
+                  <feature.icon className="w-6 h-6 text-white/70 group-hover:text-yellow-400 transition-colors" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
                 <p className="text-white/40 leading-relaxed text-sm">{feature.desc}</p>
@@ -299,7 +302,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <p className="text-indigo-400 text-sm font-medium mb-3 uppercase tracking-wider">Simple Process</p>
+            <p className="text-yellow-500 text-sm font-bold mb-3 uppercase tracking-widest">Simple Process</p>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
               <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                 How It Works
@@ -309,7 +312,7 @@ export default function LandingPage() {
 
           <div className="relative">
             {/* Connector line */}
-            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent -translate-y-1/2" />
+            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent -translate-y-1/2" />
 
             <div className="grid md:grid-cols-4 gap-8">
               {howItWorks.map((step, i) => (
@@ -321,10 +324,10 @@ export default function LandingPage() {
                   transition={{ delay: i * 0.15 }}
                   className="relative text-center"
                 >
-                  <div className="relative z-10 w-16 h-16 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/20 flex items-center justify-center">
-                    <step.icon className="w-7 h-7 text-indigo-400" />
+                  <div className="relative z-10 w-16 h-16 mx-auto mb-5 rounded-2xl bg-[#0a0a0a] border border-white/10 group-hover:border-yellow-500/50 flex items-center justify-center transition-colors">
+                    <step.icon className="w-7 h-7 text-yellow-500" />
                   </div>
-                  <span className="text-xs font-bold text-indigo-500 mb-2 block">{step.step}</span>
+                  <span className="text-xs font-bold text-yellow-600 mb-2 block tracking-widest">{step.step}</span>
                   <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
                   <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
                 </motion.div>
@@ -335,8 +338,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials ──────────────────────────────── */}
-      <section id="testimonials" className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-950/10 to-transparent" />
+      <section id="testimonials" className="py-24 relative border-t border-white/5">
+        <div className="absolute inset-0 bg-[#050505]" />
         <div className="relative max-w-6xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -344,7 +347,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <p className="text-indigo-400 text-sm font-medium mb-3 uppercase tracking-wider">Community Love</p>
+            <p className="text-yellow-500 text-sm font-bold mb-3 uppercase tracking-widest">Community Love</p>
             <h2 className="text-4xl md:text-5xl font-bold">
               <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
                 What Our Heroes Say
@@ -387,9 +390,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="relative rounded-3xl overflow-hidden"
           >
-            {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600" />
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:32px_32px]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#111] to-[#050505] border border-white/10 rounded-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(234,179,8,0.15),transparent_70%)]" />
 
             <div className="relative px-8 md:px-16 py-16 text-center">
               <h2 className="text-3xl md:text-5xl font-bold mb-4">
@@ -401,14 +403,14 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   to="/sign-up"
-                  className="group flex items-center gap-2 bg-white text-indigo-700 px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/90 transition-all hover:scale-[1.02]"
+                  className="group flex items-center gap-2 bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 text-black px-10 py-4 rounded-full text-lg font-bold hover:brightness-110 transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(234,179,8,0.4)]"
                 >
                   Join GramSahay
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   to="/community-map"
-                  className="flex items-center gap-2 px-8 py-4 rounded-full text-lg font-medium border border-white/30 hover:bg-white/10 transition-all"
+                  className="flex items-center gap-2 px-8 py-4 rounded-full text-lg font-medium border border-white/20 hover:border-yellow-500/50 hover:text-yellow-400 hover:bg-white/5 transition-all"
                 >
                   Explore Issues Map
                 </Link>
@@ -417,28 +419,6 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* ── Footer ────────────────────────────────────── */}
-      <footer className="border-t border-white/5 py-12">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold text-white/80">GramSahay</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-white/30">
-              <Link to="/sign-in" className="hover:text-white/60 transition-colors">Sign In</Link>
-              <a href="#features" className="hover:text-white/60 transition-colors">Features</a>
-              <a href="#how-it-works" className="hover:text-white/60 transition-colors">How It Works</a>
-            </div>
-            <div className="text-sm text-white/20">
-              Built with ❤️ for Indian Communities · Powered by Google Gemini
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

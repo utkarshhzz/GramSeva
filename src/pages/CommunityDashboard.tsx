@@ -19,6 +19,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import { generateCommunityInsights } from '@/lib/gemini';
 import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
 import type { CommunityIssue, AICommunityInsight } from '@/types/community';
+import FloatingChatbot from '@/components/FloatingChatbot';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -37,13 +38,13 @@ export default function CommunityDashboard() {
   const { translate } = useLanguage();
 
   const quickActions = [
-    { icon: Plus,      label: translate('reportIssue'),       to: '/report',           color: 'from-indigo-500 to-purple-500' },
-    { icon: MapIcon,   label: translate('communityMap'),       to: '/community-map',    color: 'from-cyan-500 to-blue-500' },
-    { icon: Mic,       label: translate('voiceReport'),        to: '/report',           color: 'from-pink-500 to-rose-500' },
-    { icon: BarChart3, label: translate('analytics'),           to: '/analytics',        color: 'from-amber-500 to-orange-500' },
-    { icon: Trophy,    label: translate('leaderboard'),         to: '/leaderboard',      color: 'from-emerald-500 to-green-500' },
-    { icon: MessageSquare, label: translate('aiAssistant'),    to: '/assistant',        color: 'from-violet-500 to-purple-500' },
-    { icon: Building2, label: translate('govSchemes'),         to: '/government',          color: 'from-blue-500 to-cyan-500' },
+    { icon: Plus,      label: translate('reportIssue'),       to: '/report',           color: 'from-yellow-600 to-yellow-400' },
+    { icon: MapIcon,   label: translate('communityMap'),       to: '/community-map',    color: 'from-yellow-500 to-amber-600' },
+    { icon: Mic,       label: translate('voiceReport'),        to: '/report',           color: 'from-amber-400 to-orange-500' },
+    { icon: BarChart3, label: translate('analytics'),           to: '/analytics',        color: 'from-orange-500 to-red-500' },
+    { icon: Trophy,    label: translate('leaderboard'),         to: '/leaderboard',      color: 'from-yellow-600 to-amber-500' },
+    { icon: MessageSquare, label: translate('aiAssistant'),    to: '/assistant',        color: 'from-amber-600 to-yellow-600' },
+    { icon: Building2, label: translate('govSchemes'),         to: '/government',          color: 'from-yellow-500 to-yellow-700' },
   ];
 
   const [myIssues, setMyIssues] = useState<CommunityIssue[]>([]);
@@ -177,13 +178,13 @@ export default function CommunityDashboard() {
   return (
     <div className="min-h-screen bg-[#06060a] text-white">
       {/* Header */}
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-[#06060a]/80 border-b border-white/5">
+      <div className="sticky top-0 z-50 backdrop-blur-xl bg-[#050505]/80 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-black" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-white">
               GramSahay
             </span>
           </Link>
@@ -194,7 +195,7 @@ export default function CommunityDashboard() {
             </div>
             <Link
               to="/report"
-              className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 rounded-full text-sm font-medium hover:from-indigo-400 hover:to-purple-500 transition-all"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-600 to-yellow-500 px-4 py-2 rounded-full text-sm font-bold text-black hover:brightness-110 transition-all shadow-[0_0_15px_rgba(234,179,8,0.2)]"
             >
               <Plus className="w-4 h-4" />
               {translate('reportIssue')}
@@ -238,7 +239,9 @@ export default function CommunityDashboard() {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: i * 0.1, type: 'spring', stiffness: 100 }}
-              className="p-6 rounded-3xl bg-white/[0.01] border border-white/[0.03] backdrop-blur-xl hover:bg-white/[0.03] transition-colors"
+              whileHover={{ scale: 1.05, rotateX: 5, rotateY: 5, zIndex: 10 }}
+              style={{ transformPerspective: 1000 }}
+              className="p-6 rounded-3xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.15)] transition-all duration-300"
             >
               <stat.icon className={`w-5 h-5 ${stat.color} mb-3`} />
               <p className="text-3xl font-bold text-white tracking-tight">{stat.value}</p>
@@ -252,16 +255,17 @@ export default function CommunityDashboard() {
           <h2 className="text-lg font-semibold mb-4">{translate('quickActions')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {quickActions.map((action, i) => (
-              <Link
-                key={i}
-                to={action.to}
-                className="group p-5 rounded-3xl bg-white/[0.015] border border-white/[0.03] backdrop-blur-xl hover:border-white/[0.08] transition-all text-center hover:bg-white/[0.04] shadow-sm hover:shadow-xl hover:shadow-indigo-500/10"
-              >
-                <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                  <action.icon className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-sm text-white/70">{action.label}</p>
-              </Link>
+              <motion.div key={i} whileHover={{ scale: 1.05, rotateX: -5, rotateY: 5 }} style={{ transformPerspective: 800 }}>
+                <Link
+                  to={action.to}
+                  className="block group p-5 rounded-3xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/50 transition-all text-center shadow-sm hover:shadow-[0_0_25px_rgba(234,179,8,0.2)] h-full"
+                >
+                  <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-inner`}>
+                    <action.icon className="w-6 h-6 text-black" />
+                  </div>
+                  <p className="text-sm font-medium text-white/70 group-hover:text-yellow-400 transition-colors">{action.label}</p>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -302,15 +306,16 @@ export default function CommunityDashboard() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
+                    whileHover={{ scale: 1.02, x: 5 }}
                     key={issue.id}
                   >
                     <Link
                       to={`/issues/${issue.id}`}
-                      className="block p-5 rounded-2xl bg-white/[0.015] border border-white/[0.04] hover:bg-white/[0.03] hover:border-white/[0.08] backdrop-blur-md transition-all shadow-lg hover:shadow-indigo-500/5 group"
+                      className="block p-5 rounded-2xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/30 transition-all shadow-lg hover:shadow-[0_0_20px_rgba(234,179,8,0.1)] group"
                     >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h3 className="text-lg font-medium text-white/90 line-clamp-1 group-hover:text-indigo-300 transition-colors">{issue.title}</h3>
+                        <h3 className="text-lg font-medium text-white/90 line-clamp-1 group-hover:text-yellow-400 transition-colors">{issue.title}</h3>
                         <p className="text-sm text-white/40 mt-1.5 line-clamp-2 leading-relaxed">{issue.description}</p>
                       </div>
                       <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] ${statusMeta?.bgColor} ${statusMeta?.color} border`}>
@@ -332,9 +337,9 @@ export default function CommunityDashboard() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* My Profile Card */}
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.1)]">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-lg font-bold">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center text-lg font-bold text-black">
                   {(profile?.name?.[0] || 'U').toUpperCase()}
                 </div>
                 <div>
@@ -344,11 +349,11 @@ export default function CommunityDashboard() {
               </div>
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div>
-                  <p className="text-lg font-bold text-indigo-400">{profile?.points || 0}</p>
+                  <p className="text-lg font-bold text-yellow-500">{profile?.points || 0}</p>
                   <p className="text-[10px] text-white/30">Points</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-emerald-400">{profile?.issuesReported || 0}</p>
+                  <p className="text-lg font-bold text-white/80">{profile?.issuesReported || 0}</p>
                   <p className="text-[10px] text-white/30">Reported</p>
                 </div>
                 <div>
@@ -359,16 +364,16 @@ export default function CommunityDashboard() {
             </div>
 
             {/* AI Insights */}
-            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+            <div className="p-5 rounded-2xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/30 transition-colors">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-indigo-400" />
+                <h3 className="text-sm font-medium flex items-center gap-2 text-yellow-500">
+                  <Sparkles className="w-4 h-4" />
                   AI Insights
                 </h3>
                 <button
                   onClick={loadInsights}
                   disabled={insightsLoading}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 disabled:opacity-30"
+                  className="text-xs text-yellow-600 hover:text-yellow-400 disabled:opacity-30"
                 >
                   {insightsLoading ? 'Generating...' : 'Generate'}
                 </button>
@@ -376,12 +381,12 @@ export default function CommunityDashboard() {
 
               {insightsLoading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />
                 </div>
               ) : insights.length > 0 ? (
                 <div className="space-y-3">
                   {insights.map(insight => (
-                    <div key={insight.id} className="p-3 rounded-xl bg-white/[0.03]">
+                    <div key={insight.id} className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
                       <p className="text-xs font-medium text-white/70 mb-1">{insight.title}</p>
                       <p className="text-xs text-white/40">{insight.description}</p>
                     </div>
@@ -413,7 +418,7 @@ export default function CommunityDashboard() {
                             initial={{ width: 0 }}
                             animate={{ width: `${pct}%` }}
                             transition={{ duration: 1, ease: 'easeOut' }}
-                            className="h-full bg-indigo-500 rounded-full"
+                            className="h-full bg-yellow-500 rounded-full"
                           />
                         </div>
                       </div>
@@ -425,6 +430,9 @@ export default function CommunityDashboard() {
           </div>
         </div>
       </div>
+      
+      {/* Floating Chatbot */}
+      <FloatingChatbot />
     </div>
   );
 }
