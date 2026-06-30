@@ -10,10 +10,10 @@ import {
   Shield, ArrowUp, Clock, TrendingUp, AlertTriangle,
   CheckCircle2, Loader2, LogOut, Settings, Sparkles,
   Construction, Droplets, Zap, Trash2, ShieldAlert,
-  TreePine, Map as MapIcon, Mic, FileText,
+  TreePine, Map as MapIcon, Mic, FileText, Database, Building2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
-import { getIssues, getUserIssues, getCommunityStats } from '@/lib/firestore';
+import { getIssues, getUserIssues, getCommunityStats, createIssue } from '@/lib/firestore';
 import { generateCommunityInsights } from '@/lib/gemini';
 import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
 import type { CommunityIssue, AICommunityInsight } from '@/types/community';
@@ -34,6 +34,7 @@ const quickActions = [
   { icon: BarChart3, label: 'Analytics',           to: '/analytics',        color: 'from-amber-500 to-orange-500' },
   { icon: Trophy,    label: 'Leaderboard',         to: '/leaderboard',      color: 'from-emerald-500 to-green-500' },
   { icon: MessageSquare, label: 'AI Assistant',    to: '/assistant',        color: 'from-violet-500 to-purple-500' },
+  { icon: Building2, label: 'Gov Schemes',         to: '/schemes',          color: 'from-blue-500 to-cyan-500' },
 ];
 
 export default function CommunityDashboard() {
@@ -81,6 +82,72 @@ export default function CommunityDashboard() {
       console.error('Insights error:', e);
     }
     setInsightsLoading(false);
+  };
+
+  const seedDummyData = async () => {
+    if (!user || !profile) {
+      alert("Please log in to seed data.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const dummyIssues = [
+        {
+          title: "Broken Water Pipeline in Ward 4",
+          description: "There is a massive water leak on the main road causing flooding and water wastage for the past 2 days.",
+          category: "water" as any,
+          severity: "high" as any,
+          location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
+          address: "Ward 4, Near Main Bazaar",
+        },
+        {
+          title: "Streetlights not working",
+          description: "The streetlights near the community center have been out for a week. It's unsafe at night.",
+          category: "electricity" as any,
+          severity: "medium" as any,
+          location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
+          address: "Community Center Road",
+        },
+        {
+          title: "Illegal Garbage Dumping",
+          description: "People are dumping garbage in the empty plot next to the school. The smell is unbearable.",
+          category: "sanitation" as any,
+          severity: "critical" as any,
+          location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
+          address: "Plot 42, School Lane",
+        }
+      ];
+
+      for (const issue of dummyIssues) {
+        await createIssue({
+          reporterId: user.uid,
+          reporterName: profile.name || user.email || 'Anonymous',
+          reporterAvatar: profile.profileImage || '',
+          title: issue.title,
+          description: issue.description,
+          category: issue.category,
+          severity: issue.severity,
+          status: 'reported',
+          location: issue.location,
+          address: issue.address,
+          ward: 'Demo Ward',
+          images: ['https://images.unsplash.com/photo-1518770660439-4636190af475'],
+          aiCategory: issue.category,
+          aiSeverity: issue.severity,
+          aiSummary: 'Auto-generated dummy issue for demo purposes.',
+          aiSuggestions: ['Dispatch team immediately', 'Assess damage', 'Inform community'],
+          aiAuthority: 'Local Municipal Corporation',
+          aiComplaintDraft: 'Dear Authority,\n\nI am reporting an issue regarding...',
+          acknowledgedAt: null,
+          resolvedAt: null,
+        });
+      }
+      await loadData();
+    } catch (e) {
+      console.error("Seed error:", e);
+      alert("Failed to seed data. Check console.");
+    }
+    setLoading(false);
   };
 
   const resolutionRate = stats.totalIssues > 0
@@ -198,13 +265,22 @@ export default function CommunityDashboard() {
             {recentIssues.length === 0 ? (
               <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
                 <p className="text-white/40 mb-4">No issues reported yet</p>
-                <Link
-                  to="/report"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-2 rounded-full text-sm"
-                >
-                  <Plus className="w-4 h-4" />
-                  Report First Issue
-                </Link>
+                <div className="flex items-center justify-center gap-3">
+                  <Link
+                    to="/report"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-2 rounded-full text-sm hover:opacity-90"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Report First Issue
+                  </Link>
+                  <button
+                    onClick={seedDummyData}
+                    className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-2 rounded-full text-sm transition-colors"
+                  >
+                    <Database className="w-4 h-4" />
+                    Seed Demo Data
+                  </button>
+                </div>
               </div>
             ) : (
               recentIssues.map(issue => {

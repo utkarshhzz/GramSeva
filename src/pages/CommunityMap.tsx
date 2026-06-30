@@ -1,7 +1,3 @@
-// ============================================================
-// GramSahay — Community Map Page
-// ============================================================
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -11,11 +7,21 @@ import {
   TreePine, Building2, Volume2, Fence, MoreHorizontal,
   Clock, ArrowUp, MapPin, Loader2,
 } from 'lucide-react';
-import { Map, Marker, Overlay } from 'pigeon-maps';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getIssues } from '@/lib/firestore';
 import { CATEGORIES, SEVERITIES } from '@/types/community';
 import type { CommunityIssue, IssueCategory } from '@/types/community';
+
+// Fix Leaflet default marker icon paths
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const SEVERITY_COLORS: Record<string, string> = {
   low: '#10b981',
@@ -41,11 +47,29 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
+// Component to handle map centering
+function MapUpdater({ center, zoom }: { center: [number, number]; zoom: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
+  return null;
+}
+
+// Custom Marker Icon generator
+const createCustomIcon = (color: string) => {
+  return L.divIcon({
+    className: 'custom-leaflet-marker',
+    html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+};
+
 export default function CommunityMap() {
   const navigate = useNavigate();
   const [issues, setIssues] = useState<CommunityIssue[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedIssue, setSelectedIssue] = useState<CommunityIssue | null>(null);
   const [filterCategory, setFilterCategory] = useState<IssueCategory | ''>('');
   const [center, setCenter] = useState<[number, number]>([22.5937, 78.9629]);
   const [zoom, setZoom] = useState(5);
@@ -53,13 +77,12 @@ export default function CommunityMap() {
 
   useEffect(() => {
     loadIssues();
-    // Try to get user location
     navigator.geolocation?.getCurrentPosition(
       (pos) => {
         setCenter([pos.coords.latitude, pos.coords.longitude]);
         setZoom(12);
       },
-      () => {} // ignore
+      () => {}
     );
   }, []);
 
@@ -96,7 +119,7 @@ export default function CommunityMap() {
 
           <h1 className="text-lg font-semibold flex items-center gap-2">
             <MapPin className="w-5 h-5 text-indigo-400" />
-            Community Map
+            Community Hotspot Map
           </h1>
 
           <div className="flex items-center gap-2">
@@ -160,39 +183,70 @@ export default function CommunityMap() {
       </div>
 
       {/* Map */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative z-0">
         {loading && (
           <div className="absolute inset-0 z-10 bg-[#06060a]/50 flex items-center justify-center">
             <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
           </div>
         )}
 
-        <Map
+        <MapContainer
           center={center}
           zoom={zoom}
-          onBoundsChanged={({ center, zoom }) => {
-            setCenter(center);
-            setZoom(zoom);
-          }}
-          onClick={() => setSelectedIssue(null)}
+          className="w-full h-full bg-[#0a0a0f]"
+          zoomControl={false}
         >
+          <TileLayer
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          />
+          <MapUpdater center={center} zoom={zoom} />
+          
           {issues.map(issue => {
             if (!issue.location?.lat || !issue.location?.lng) return null;
             const color = SEVERITY_COLORS[issue.severity] || '#6366f1';
+            const Icon = CATEGORY_ICONS[issue.category] || MoreHorizontal;
+            
             return (
               <Marker
                 key={issue.id}
-                anchor={[issue.location.lat, issue.location.lng]}
-                color={color}
-                width={selectedIssue?.id === issue.id ? 50 : 36}
-                onClick={() => setSelectedIssue(issue)}
-              />
+                position={[issue.location.lat, issue.location.lng]}
+                icon={createCustomIcon(color)}
+              >
+                <Popup className="custom-popup">
+                  <div className="p-2 w-64">
+                    <div className="flex items-start gap-3 mb-2">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${color}20` }}
+                      >
+                        <Icon className="w-4 h-4" style={{ color }} />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-gray-900 line-clamp-1">{issue.title}</h3>
+                        <p className="text-xs text-gray-500 line-clamp-2">{issue.description}</p>
+                      </div>
+                    </div>
+                    {issue.images?.[0] && (
+                      <div className="rounded-lg overflow-hidden mb-2 h-24">
+                        <img src={issue.images[0]} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <Link
+                      to={`/issues/${issue.id}`}
+                      className="w-full block text-center py-1.5 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-medium hover:bg-indigo-100 transition-colors"
+                    >
+                      View Full Details
+                    </Link>
+                  </div>
+                </Popup>
+              </Marker>
             );
           })}
-        </Map>
+        </MapContainer>
 
         {/* Legend */}
-        <div className="absolute bottom-6 left-6 p-3 rounded-xl bg-[#0a0a0f]/90 backdrop-blur-xl border border-white/10">
+        <div className="absolute bottom-6 left-6 p-3 rounded-xl bg-[#0a0a0f]/90 backdrop-blur-xl border border-white/10 z-10">
           <p className="text-xs text-white/30 mb-2">Severity</p>
           <div className="flex flex-col gap-1.5">
             {SEVERITIES.map(s => (
@@ -208,76 +262,33 @@ export default function CommunityMap() {
         </div>
 
         {/* Stats badge */}
-        <div className="absolute top-4 left-4 px-3 py-2 rounded-xl bg-[#0a0a0f]/90 backdrop-blur-xl border border-white/10">
+        <div className="absolute top-4 left-4 px-3 py-2 rounded-xl bg-[#0a0a0f]/90 backdrop-blur-xl border border-white/10 z-10">
           <p className="text-xs text-white/30">Issues on map</p>
           <p className="text-lg font-bold text-white">{issues.length}</p>
         </div>
-
-        {/* Selected issue popup */}
-        {selectedIssue && (
-          <div className="absolute bottom-6 right-6 left-20 md:left-auto md:w-96">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-5 rounded-2xl bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10"
-            >
-              <div className="flex items-start gap-3 mb-3">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: `${SEVERITY_COLORS[selectedIssue.severity]}20` }}
-                >
-                  {(() => {
-                    const Icon = CATEGORY_ICONS[selectedIssue.category] || MoreHorizontal;
-                    return <Icon className="w-5 h-5" style={{ color: SEVERITY_COLORS[selectedIssue.severity] }} />;
-                  })()}
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-white line-clamp-1">{selectedIssue.title}</h3>
-                  <p className="text-sm text-white/40 line-clamp-2">{selectedIssue.description}</p>
-                </div>
-              </div>
-
-              {selectedIssue.images?.[0] && (
-                <div className="rounded-xl overflow-hidden mb-3 h-32">
-                  <img src={selectedIssue.images[0]} alt="" className="w-full h-full object-cover" />
-                </div>
-              )}
-
-              <div className="flex items-center gap-3 text-xs text-white/30 mb-4">
-                <span className="flex items-center gap-1">
-                  <ArrowUp className="w-3 h-3" />
-                  {selectedIssue.upvotes} votes
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {timeAgo(selectedIssue.createdAt)}
-                </span>
-                <span className={`ml-auto px-2 py-0.5 rounded text-xs ${
-                  STATUSES.find(s => s.key === selectedIssue.status)?.bgColor
-                } ${STATUSES.find(s => s.key === selectedIssue.status)?.color} border`}>
-                  {STATUSES.find(s => s.key === selectedIssue.status)?.label}
-                </span>
-              </div>
-
-              <Link
-                to={`/issues/${selectedIssue.id}`}
-                className="w-full block text-center py-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 text-sm font-medium hover:bg-indigo-500/30 transition-colors"
-              >
-                View Details
-              </Link>
-            </motion.div>
-          </div>
-        )}
       </div>
+      
+      {/* Global styles for leaflet overrides */}
+      <style>{`
+        .leaflet-container {
+          font-family: inherit;
+        }
+        .custom-popup .leaflet-popup-content-wrapper {
+          background-color: white;
+          border-radius: 12px;
+          padding: 0;
+          overflow: hidden;
+        }
+        .custom-popup .leaflet-popup-content {
+          margin: 0;
+        }
+        .custom-popup .leaflet-popup-tip {
+          background-color: white;
+        }
+        .leaflet-control-attribution a {
+          color: #6366f1 !important;
+        }
+      `}</style>
     </div>
   );
 }
-
-// Need this for the import used above
-const STATUSES = [
-  { key: 'reported',     label: 'Reported',      color: 'text-blue-400',    bgColor: 'bg-blue-500/10 border-blue-500/20' },
-  { key: 'acknowledged', label: 'Acknowledged',   color: 'text-purple-400',  bgColor: 'bg-purple-500/10 border-purple-500/20' },
-  { key: 'in_progress',  label: 'In Progress',    color: 'text-amber-400',   bgColor: 'bg-amber-500/10 border-amber-500/20' },
-  { key: 'resolved',     label: 'Resolved',       color: 'text-emerald-400', bgColor: 'bg-emerald-500/10 border-emerald-500/20' },
-  { key: 'closed',       label: 'Closed',         color: 'text-gray-400',    bgColor: 'bg-gray-500/10 border-gray-500/20' },
-];

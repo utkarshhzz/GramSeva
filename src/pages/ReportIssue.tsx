@@ -12,7 +12,9 @@ import {
   TreePine, Building2, Volume2, Fence, MoreHorizontal,
   CheckCircle2, Shield,
 } from 'lucide-react';
-import { Map, Marker } from 'pigeon-maps';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { createIssue, uploadIssueImage } from '@/lib/firestore';
 import { classifyIssue, processVoiceReport } from '@/lib/gemini';
@@ -25,6 +27,25 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   public_services: Building2, noise: Volume2, encroachment: Fence,
   other: MoreHorizontal,
 };
+
+// Custom Marker Icon generator
+const createCustomIcon = (color: string) => {
+  return L.divIcon({
+    className: 'custom-leaflet-marker',
+    html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+};
+
+function LocationPicker({ setLocation }: { setLocation: (loc: GeoPoint) => void }) {
+  useMapEvents({
+    click(e) {
+      setLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
+    }
+  });
+  return null;
+}
 
 type Step = 'describe' | 'location' | 'media' | 'ai_review' | 'submitting' | 'done';
 
@@ -449,23 +470,25 @@ export default function ReportIssue() {
               </button>
 
               {/* Map */}
-              <div className="rounded-2xl overflow-hidden border border-white/10 h-[300px]">
-                <Map
-                  height={300}
+              <div className="rounded-2xl overflow-hidden border border-white/10 h-[300px] relative z-0">
+                <MapContainer
                   center={location ? [location.lat, location.lng] : [22.5937, 78.9629]}
                   zoom={location ? 15 : 5}
-                  onClick={({ latLng }) => {
-                    setLocation({ lat: latLng[0], lng: latLng[1] });
-                  }}
+                  className="w-full h-full bg-[#0a0a0f]"
+                  zoomControl={true}
                 >
+                  <TileLayer
+                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <LocationPicker setLocation={setLocation} />
                   {location && (
                     <Marker
-                      width={40}
-                      anchor={[location.lat, location.lng]}
-                      color="#6366f1"
+                      position={[location.lat, location.lng]}
+                      icon={createCustomIcon('#6366f1')}
                     />
                   )}
-                </Map>
+                </MapContainer>
               </div>
 
               {address && (

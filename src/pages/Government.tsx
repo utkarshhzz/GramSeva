@@ -12,6 +12,18 @@ const Government = () => {
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [realSchemes, setRealSchemes] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 20;
+
+  React.useEffect(() => {
+    fetch('/myschemes_scraped.json')
+      .then(res => res.json())
+      .then(data => {
+        setRealSchemes(data);
+      })
+      .catch(console.error);
+  }, []);
 
   const toggleContrast = () => {
     setIsHighContrast(!isHighContrast);
@@ -120,15 +132,38 @@ const Government = () => {
     }
   ];
 
-  const filteredSchemes = schemes.filter(scheme => {
-    const matchesSearch = scheme.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      scheme.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      scheme.englishDescription.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = selectedCategory === 'all' || scheme.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+  const filteredSchemes = React.useMemo(() => {
+    const combined = [...schemes];
+    if (realSchemes.length > 0) {
+      combined.push(...realSchemes.map((rs, idx) => ({
+        title: rs.scheme_name || `Scheme ${idx}`,
+        description: rs.details?.replace('Details\n', '').substring(0, 100) + '...' || '',
+        englishDescription: '',
+        benefits: rs.benefits?.replace('Benefits\n', '') || '',
+        eligibility: rs.eligibility?.replace('Eligibility\n', '') || '',
+        logo: "https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg",
+        link: rs.scheme_link !== 'NaN' ? rs.scheme_link : '#',
+        category: "financial", // fallback
+        icon: Building2,
+        color: "bg-blue-50 dark:bg-blue-950",
+        popular: false
+      })));
+    }
+
+    return combined.filter(scheme => {
+      const matchesSearch = scheme.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        scheme.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (scheme.englishDescription && scheme.englishDescription.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesCategory = selectedCategory === 'all' || scheme.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    });
+  }, [schemes, realSchemes, searchTerm, selectedCategory]);
+
+  const displayedSchemes = React.useMemo(() => {
+    return filteredSchemes.slice(0, page * itemsPerPage);
+  }, [filteredSchemes, page]);
 
   const categories = [
     { id: 'all', label: 'All Schemes', labelHi: 'सभी योजनाएँ' },
@@ -181,7 +216,7 @@ const Government = () => {
           {/* Stats Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 text-center">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">{schemes.length}+</div>
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">{realSchemes.length > 0 ? (realSchemes.length + schemes.length) : schemes.length}+</div>
               <div className="text-gray-600 dark:text-gray-400">Active Schemes</div>
             </div>
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 text-center">
@@ -247,7 +282,7 @@ const Government = () => {
               </h2>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredSchemes.map((scheme, index) => (
+              {displayedSchemes.map((scheme, index) => (
                 <GovernmentScheme
                   key={index}
                   title={scheme.title}
@@ -262,6 +297,14 @@ const Government = () => {
                 />
               ))}
             </div>
+            
+            {displayedSchemes.length < filteredSchemes.length && (
+              <div className="flex justify-center mt-8">
+                <Button onClick={() => setPage(p => p + 1)} variant="outline" className="px-8">
+                  Load More Schemes
+                </Button>
+              </div>
+            )}
           </div>
           
           {filteredSchemes.length === 0 && (

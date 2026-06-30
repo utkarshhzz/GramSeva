@@ -10,9 +10,11 @@ import {
   Sparkles, ChevronRight, CheckCircle2, Copy, Share2,
   Construction, Droplets, Zap, Trash2, ShieldAlert,
   TreePine, Building2, Volume2, Fence, MoreHorizontal,
-  Loader2, AlertTriangle, Shield,
+  Loader2, AlertTriangle, Shield, HeartHandshake, Mail, MessageCircle,
 } from 'lucide-react';
-import { Map, Marker } from 'pigeon-maps';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getIssue, toggleVote, hasUserVoted, addComment, getComments, updateIssueStatus } from '@/lib/firestore';
 import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
@@ -27,6 +29,16 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 
 const SEVERITY_COLORS: Record<string, string> = {
   low: '#10b981', medium: '#f59e0b', high: '#f97316', critical: '#ef4444',
+};
+
+// Custom Marker Icon generator
+const createCustomIcon = (color: string) => {
+  return L.divIcon({
+    className: 'custom-leaflet-marker',
+    html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
 };
 
 function timeAgo(dateStr: string): string {
@@ -52,6 +64,22 @@ export default function IssueDetail() {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [showComplaint, setShowComplaint] = useState(false);
+  const [hasVolunteered, setHasVolunteered] = useState(false);
+
+  // Free Hackathon Feature: Generate WhatsApp share link
+  const getWhatsAppLink = () => {
+    if (!issue) return '#';
+    const text = `🚨 Urgent Community Issue: ${issue.title}\n📍 ${issue.ward || 'Local Area'}\n\nTap here to upvote so the authorities fix it faster! Together we can make a difference.\n\n${window.location.href}`;
+    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  };
+
+  // Free Hackathon Feature: Generate mailto link for escalation
+  const getMailtoLink = () => {
+    if (!issue) return '#';
+    const subject = `Urgent Community Issue: ${issue.title}`;
+    const body = `Dear Authority,\n\nI am writing to bring to your attention a critical community issue that has gathered ${voteCount} upvotes from local residents.\n\nIssue: ${issue.title}\nLocation: ${issue.address || issue.ward || 'See map'}\n\nDescription:\n${issue.description}\n\nPlease take immediate action to resolve this matter.\n\nRegards,\nConcerned Citizen`;
+    return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
 
   useEffect(() => {
     if (id) loadIssue();
@@ -204,18 +232,22 @@ export default function IssueDetail() {
 
             {/* Map */}
             {issue.location && (
-              <div className="rounded-2xl overflow-hidden border border-white/10 h-[200px]">
-                <Map
-                  height={200}
+              <div className="rounded-2xl overflow-hidden border border-white/10 h-[200px] relative z-0">
+                <MapContainer
                   center={[issue.location.lat, issue.location.lng]}
                   zoom={15}
+                  className="w-full h-full bg-[#0a0a0f]"
+                  zoomControl={false}
                 >
-                  <Marker
-                    width={40}
-                    anchor={[issue.location.lat, issue.location.lng]}
-                    color={SEVERITY_COLORS[issue.severity] || '#6366f1'}
+                  <TileLayer
+                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   />
-                </Map>
+                  <Marker
+                    position={[issue.location.lat, issue.location.lng]}
+                    icon={createCustomIcon(SEVERITY_COLORS[issue.severity] || '#6366f1')}
+                  />
+                </MapContainer>
               </div>
             )}
             {issue.address && (
@@ -400,6 +432,39 @@ export default function IssueDetail() {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Action Buttons (Hackathon Features) */}
+            <div className="space-y-3">
+              <button 
+                onClick={() => setHasVolunteered(!hasVolunteered)}
+                className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium transition-all ${
+                  hasVolunteered 
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-900/20'
+                }`}
+              >
+                <HeartHandshake className="w-5 h-5" />
+                {hasVolunteered ? "You're volunteering for this!" : "Volunteer to Help"}
+              </button>
+
+              <a 
+                href={getWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-all border border-[#25D366]/30"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Rally Community (WhatsApp)
+              </a>
+
+              <a 
+                href={getMailtoLink()}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all border border-red-500/30"
+              >
+                <Mail className="w-5 h-5" />
+                Escalate to Authority (Email)
+              </a>
             </div>
 
             {/* Quick stats */}
