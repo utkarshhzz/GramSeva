@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getIssues, getUserIssues, getCommunityStats, createIssue } from '@/lib/firestore';
+import LanguageSelector from '@/components/LanguageSelector';
 import { generateCommunityInsights } from '@/lib/gemini';
 import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
 import type { CommunityIssue, AICommunityInsight } from '@/types/community';
@@ -34,7 +35,7 @@ const quickActions = [
   { icon: BarChart3, label: 'Analytics',           to: '/analytics',        color: 'from-amber-500 to-orange-500' },
   { icon: Trophy,    label: 'Leaderboard',         to: '/leaderboard',      color: 'from-emerald-500 to-green-500' },
   { icon: MessageSquare, label: 'AI Assistant',    to: '/assistant',        color: 'from-violet-500 to-purple-500' },
-  { icon: Building2, label: 'Gov Schemes',         to: '/schemes',          color: 'from-blue-500 to-cyan-500' },
+  { icon: Building2, label: 'Gov Schemes',         to: '/government',          color: 'from-blue-500 to-cyan-500' },
 ];
 
 export default function CommunityDashboard() {
@@ -99,6 +100,7 @@ export default function CommunityDashboard() {
           severity: "high" as any,
           location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
           address: "Ward 4, Near Main Bazaar",
+          aiComplaintDraft: "To the Municipal Corporation Water Department,\n\nSubject: Urgent - Broken Water Pipeline Causing Flooding in Ward 4\n\nRespected Sir/Madam,\n\nI am writing to bring to your urgent attention a massive water leak on the main road in Ward 4, near the Main Bazaar. This pipeline rupture has been ongoing for the past two days, resulting in significant water wastage and localized flooding that is severely inconveniencing residents and commuters.\n\nGiven the current water scarcity challenges, such continuous wastage is alarming. Additionally, the stagnant water poses a risk of structural damage to the road and potential health hazards due to mosquito breeding.\n\nI kindly request you to dispatch a maintenance team immediately to assess and repair the broken pipeline. Your prompt action will prevent further loss of our precious water resources and restore normalcy in the area.\n\nThank you for your anticipated cooperation.\n\nYours faithfully,\nConcerned Citizen",
         },
         {
           title: "Streetlights not working",
@@ -107,6 +109,7 @@ export default function CommunityDashboard() {
           severity: "medium" as any,
           location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
           address: "Community Center Road",
+          aiComplaintDraft: "To the State Electricity Board,\n\nSubject: Non-functional Streetlights on Community Center Road\n\nRespected Sir/Madam,\n\nI wish to report that the streetlights along the Community Center Road have been completely non-functional for the past week. This stretch of road is heavily used by pedestrians and vehicles, and the total darkness after sunset has created a significant safety hazard.\n\nResidents, particularly women and the elderly, are finding it unsafe to commute during the evening hours. The lack of illumination also increases the risk of accidents and petty crimes in the vicinity.\n\nI urgently request you to kindly arrange for a technician to inspect and repair the faulty streetlights at the earliest. Restoring proper lighting is essential for the safety and security of our neighborhood.\n\nThank you for your prompt assistance in this matter.\n\nYours sincerely,\nConcerned Citizen",
         },
         {
           title: "Illegal Garbage Dumping",
@@ -115,6 +118,7 @@ export default function CommunityDashboard() {
           severity: "critical" as any,
           location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
           address: "Plot 42, School Lane",
+          aiComplaintDraft: "To the Municipal Corporation Sanitation Department,\n\nSubject: Critical - Illegal Garbage Dumping Next to School in Plot 42\n\nRespected Sir/Madam,\n\nI am writing to file a formal complaint regarding the rampant and illegal dumping of garbage in the empty plot (Plot 42) situated directly adjacent to the local school on School Lane. The accumulated waste has created an unbearable stench and is rapidly becoming a serious health hazard for the students and nearby residents.\n\nThis unhygienic environment is attracting stray animals, flies, and mosquitoes, directly threatening the health and well-being of young children attending the school daily. This violation of public health standards requires immediate intervention.\n\nI urge the municipal authorities to clear the accumulated garbage without delay, sanitize the area, and implement measures (such as warning signs or penalizing offenders) to prevent future dumping at this site. Protecting the health of our students must be a priority.\n\nThank you for your immediate action.\n\nYours faithfully,\nConcerned Citizen",
         }
       ];
 
@@ -137,7 +141,7 @@ export default function CommunityDashboard() {
           aiSummary: 'Auto-generated dummy issue for demo purposes.',
           aiSuggestions: ['Dispatch team immediately', 'Assess damage', 'Inform community'],
           aiAuthority: 'Local Municipal Corporation',
-          aiComplaintDraft: 'Dear Authority,\n\nI am reporting an issue regarding...',
+          aiComplaintDraft: issue.aiComplaintDraft,
           acknowledgedAt: null,
           resolvedAt: null,
         });
@@ -181,6 +185,9 @@ export default function CommunityDashboard() {
           </Link>
 
           <div className="flex items-center gap-3">
+            <div className="dark">
+              <LanguageSelector />
+            </div>
             <Link
               to="/report"
               className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 rounded-full text-sm font-medium hover:from-indigo-400 hover:to-purple-500 transition-all"

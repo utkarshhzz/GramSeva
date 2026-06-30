@@ -5,6 +5,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider, useAuth } from '@/contexts/FirebaseAuthContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Pages
 import LandingPage from '@/pages/LandingPage';
@@ -73,8 +74,10 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
-        <Toaster />
+        <LanguageProvider>
+          <AppRoutes />
+          <Toaster />
+        </LanguageProvider>
       </AuthProvider>
     </BrowserRouter>
   );

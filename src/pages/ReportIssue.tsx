@@ -19,6 +19,7 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { createIssue, uploadIssueImage } from '@/lib/firestore';
 import { classifyIssue, processVoiceReport } from '@/lib/gemini';
 import { CATEGORIES, SEVERITIES } from '@/types/community';
+import LanguageSelector from '@/components/LanguageSelector';
 import type { IssueCategory, IssueSeverity, AIClassificationResult, GeoPoint } from '@/types/community';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -336,7 +337,11 @@ export default function ReportIssue() {
             Back
           </button>
           <h1 className="text-lg font-semibold">Report Issue</h1>
-          <div className="w-20" />
+          <div className="w-32 flex justify-end">
+             <div className="dark">
+               <LanguageSelector />
+             </div>
+          </div>
         </div>
 
         {/* Progress bar */}

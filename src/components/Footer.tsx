@@ -8,35 +8,35 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center mb-4">
-              <span className="text-primary text-xl font-bold mr-1">Kisaan</span>
-              <span className="text-primary-dark text-xl font-bold">Mitra</span>
+            <div className="flex items-center mb-4 gap-2">
+              <span className="text-primary text-xl font-bold flex items-center">
+                Gram<span className="text-primary-dark">Sahay</span>
+              </span>
             </div>
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-              Empowering farmers with technology to improve agricultural productivity and livelihood.
+              Empowering communities with technology to improve local governance and livelihood.
             </p>
             <p className="text-gray-600 dark:text-gray-400 text-sm font-noto">
-              आपका साथी, आपकी फ़सल
+              आपका समुदाय, आपकी आवाज़
             </p>
           </div>
           
           <div className="col-span-1">
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">Features</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Farm Planner</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Marketplace</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Weather Alerts</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Scheme Matcher</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Credit Tracker</a></li>
+              <li><a href="/report" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Report Issue</a></li>
+              <li><a href="/community-map" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Community Map</a></li>
+              <li><a href="/assistant" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">AI Assistant</a></li>
+              <li><a href="/leaderboard" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Leaderboard</a></li>
+              <li><a href="/analytics" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Analytics</a></li>
             </ul>
           </div>
           
           <div className="col-span-1">
             <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4">Resources</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Farmer Stories</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Government Schemes</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">AI Advisor</a></li>
+              <li><a href="/government" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Government Schemes</a></li>
+              <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Community Guidelines</a></li>
               <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Blog</a></li>
               <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">FAQ</a></li>
             </ul>
@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
             </h4>
             <div className="rounded-lg border border-primary/20 bg-primary/5 dark:bg-primary/10 p-4 mb-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-primary dark:text-primary/90 mb-1">
-                Kisaan helpline
+                GramSahay helpline
               </p>
               <a
                 href={kisaanHelplineTelHref}
@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
               </p>
             </div>
             <ul className="space-y-2">
-              <li className="text-gray-600 dark:text-gray-400 text-sm">Email: info@kisaanmitra.org</li>
+              <li className="text-gray-600 dark:text-gray-400 text-sm">Email: info@gramsahay.org</li>
               <li className="text-gray-600 dark:text-gray-400 text-sm">Address: New Delhi, India</li>
             </ul>
             <div className="mt-4">
@@ -88,11 +88,11 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
-              &copy; {new Date().getFullYear()} KisaanMitra. All rights reserved.
+              &copy; {new Date().getFullYear()} GramSahay. All rights reserved.
             </p>
             <div className="flex items-center">
               <p className="text-gray-500 dark:text-gray-400 text-sm">
-                Made with <Heart size={14} className="inline text-red-500" /> for Indian Farmers
+                Made with <Heart size={14} className="inline text-red-500" /> for Indian Communities
               </p>
             </div>
           </div>

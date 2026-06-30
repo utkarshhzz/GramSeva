@@ -19,6 +19,7 @@ import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { getIssue, toggleVote, hasUserVoted, addComment, getComments, updateIssueStatus } from '@/lib/firestore';
 import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
 import type { CommunityIssue, IssueComment } from '@/types/community';
+import LanguageSelector from '@/components/LanguageSelector';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   roads: Construction, water: Droplets, electricity: Zap,
@@ -173,14 +174,19 @@ export default function IssueDetail() {
             <ArrowLeft className="w-5 h-5" />
             Back
           </button>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-            }}
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-          >
-            <Share2 className="w-4 h-4 text-white/60" />
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="dark">
+              <LanguageSelector />
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+              }}
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+            >
+              <Share2 className="w-4 h-4 text-white/60" />
+            </button>
+          </div>
         </div>
       </div>
 

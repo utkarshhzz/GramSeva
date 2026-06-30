@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Menu, X, ChevronDown, Leaf } from 'lucide-react';
 import { 
@@ -37,9 +37,10 @@ const Navigation: React.FC = () => {
   return (
     <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
       <div className="flex items-center">
-        <NavLink to="/" className="text-2xl font-bold text-primary">
-          <span className="font-bold">Kisaan</span>
-          <span className="text-primary-dark">Mitra</span>
+        <NavLink to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
+          <Leaf className="w-6 h-6 text-green-500" />
+          <span className="font-bold">Gram</span>
+          <span className="text-primary-dark">Sahay</span>
         </NavLink>
       </div>
       
@@ -54,29 +55,7 @@ const Navigation: React.FC = () => {
         >
           {translate('home')}
         </NavLink>
-        
-        <NavLink 
-          to="/features" 
-          className={`px-3 py-2 rounded-md text-sm font-medium ${
-            isActive('/features') 
-              ? 'bg-primary text-white' 
-              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-          }`}
-        >
-          {translate('features')}
-        </NavLink>
-        
-        <NavLink 
-          to="/demo" 
-          className={`px-3 py-2 rounded-md text-sm font-medium ${
-            isActive('/demo') 
-              ? 'bg-primary text-white' 
-              : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-          }`}
-        >
-          {translate('demo')}
-        </NavLink>
-        
+
         <NavLink 
           to="/government" 
           className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -106,51 +85,33 @@ const Navigation: React.FC = () => {
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/farm-planner" className="w-full cursor-pointer">
-                  {translate('farmPlanner')}
+                <NavLink to="/report" className="w-full cursor-pointer">
+                  Report Issue
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/marketplace" className="w-full cursor-pointer">
-                  {translate('marketplace')}
+                <NavLink to="/issues" className="w-full cursor-pointer">
+                  Issue Feed
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/weather" className="w-full cursor-pointer">
-                  {translate('weather')}
+                <NavLink to="/community-map" className="w-full cursor-pointer">
+                  Community Map
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/market-prices" className="w-full cursor-pointer">
-                  {translate('marketPrices')}
+                <NavLink to="/analytics" className="w-full cursor-pointer">
+                  Analytics
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/loans" className="w-full cursor-pointer">
-                  {translate('loans')}
+                <NavLink to="/leaderboard" className="w-full cursor-pointer">
+                  Leaderboard
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/ask-expert" className="w-full cursor-pointer">
-                  {translate('askExpert')}
-                </NavLink>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <NavLink to="/crop-calendar" className="w-full cursor-pointer">
-                  {translate('cropCalendar')}
-                </NavLink>
-              </DropdownMenuItem>
-              
-              {/* New services */}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <NavLink to="/cold-chain-solution" className="w-full cursor-pointer">
-                  Cold Chain Solution
-                </NavLink>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <NavLink to="/crop-analysis" className="w-full cursor-pointer">
-                  {translate('cropAnalysis')}
+                <NavLink to="/assistant" className="w-full cursor-pointer">
+                  AI Assistant
                 </NavLink>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -171,13 +132,8 @@ const Navigation: React.FC = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <NavLink to="/onboarding" className="cursor-pointer">
-                    Quick setup (chat)
-                  </NavLink>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <NavLink to="/settings" className="cursor-pointer">
-                    {translate('settings')}
+                  <NavLink to="/dashboard" className="cursor-pointer">
+                    Dashboard
                   </NavLink>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -227,30 +183,7 @@ const Navigation: React.FC = () => {
               {translate('home')}
             </NavLink>
             
-            <NavLink 
-              to="/features" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/features') 
-                  ? 'bg-primary text-white' 
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-              }`}
-              onClick={toggleMenu}
-            >
-              {translate('features')}
-            </NavLink>
-            
-            <NavLink 
-              to="/demo" 
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/demo') 
-                  ? 'bg-primary text-white' 
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-              }`}
-              onClick={toggleMenu}
-            >
-              {translate('demo')}
-            </NavLink>
-            
+
             <NavLink 
               to="/government" 
               className={`px-3 py-2 rounded-md text-sm font-medium ${
@@ -282,116 +215,75 @@ const Navigation: React.FC = () => {
                 </NavLink>
                 
                 <NavLink 
-                  to="/farm-planner" 
+                  to="/report" 
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/farm-planner') 
+                    isActive('/report') 
                       ? 'bg-primary text-white' 
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                   onClick={toggleMenu}
                 >
-                  {translate('farmPlanner')}
+                  Report Issue
                 </NavLink>
                 
                 <NavLink 
-                  to="/marketplace" 
+                  to="/issues" 
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/marketplace') 
+                    isActive('/issues') 
                       ? 'bg-primary text-white' 
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                   onClick={toggleMenu}
                 >
-                  {translate('marketplace')}
+                  Issue Feed
                 </NavLink>
                 
                 <NavLink 
-                  to="/weather" 
+                  to="/community-map" 
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/weather') 
+                    isActive('/community-map') 
                       ? 'bg-primary text-white' 
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                   onClick={toggleMenu}
                 >
-                  {translate('weather')}
+                  Community Map
                 </NavLink>
                 
                 <NavLink 
-                  to="/market-prices" 
+                  to="/analytics" 
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/market-prices') 
+                    isActive('/analytics') 
                       ? 'bg-primary text-white' 
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                   onClick={toggleMenu}
                 >
-                  {translate('marketPrices')}
+                  Analytics
                 </NavLink>
                 
                 <NavLink 
-                  to="/loans" 
+                  to="/leaderboard" 
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/loans') 
+                    isActive('/leaderboard') 
                       ? 'bg-primary text-white' 
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                   onClick={toggleMenu}
                 >
-                  {translate('loans')}
+                  Leaderboard
                 </NavLink>
                 
                 <NavLink 
-                  to="/ask-expert" 
+                  to="/assistant" 
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/ask-expert') 
+                    isActive('/assistant') 
                       ? 'bg-primary text-white' 
                       : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                   }`}
                   onClick={toggleMenu}
                 >
-                  {translate('askExpert')}
-                </NavLink>
-                
-                <NavLink 
-                  to="/crop-calendar" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/crop-calendar') 
-                      ? 'bg-primary text-white' 
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                  }`}
-                  onClick={toggleMenu}
-                >
-                  {translate('cropCalendar')}
-                </NavLink>
-                
-                {/* New services for mobile menu */}
-                <div className="pt-2 pb-1">
-                  <p className="text-xs text-gray-500 uppercase font-semibold">Advanced Features</p>
-                </div>
-                
-                <NavLink 
-                  to="/cold-chain-solution" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/cold-chain-solution') 
-                      ? 'bg-primary text-white' 
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                  }`}
-                  onClick={toggleMenu}
-                >
-                  Cold Chain Solution
-                </NavLink>
-                
-                <NavLink 
-                  to="/crop-analysis" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive('/crop-analysis') 
-                      ? 'bg-primary text-white' 
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                  }`}
-                  onClick={toggleMenu}
-                >
-                  {translate('cropAnalysis')}
+                  AI Assistant
                 </NavLink>
               </>
             )}
