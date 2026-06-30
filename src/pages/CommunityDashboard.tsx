@@ -1,0 +1,337 @@
+// ============================================================
+// GramSahay — Community Dashboard
+// ============================================================
+
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  MapPin, Plus, BarChart3, Trophy, Users, MessageSquare,
+  Shield, ArrowUp, Clock, TrendingUp, AlertTriangle,
+  CheckCircle2, Loader2, LogOut, Settings, Sparkles,
+  Construction, Droplets, Zap, Trash2, ShieldAlert,
+  TreePine, Map as MapIcon, Mic, FileText,
+} from 'lucide-react';
+import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { getIssues, getUserIssues, getCommunityStats } from '@/lib/firestore';
+import { generateCommunityInsights } from '@/lib/gemini';
+import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
+import type { CommunityIssue, AICommunityInsight } from '@/types/community';
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+const quickActions = [
+  { icon: Plus,      label: 'Report Issue',       to: '/report',           color: 'from-indigo-500 to-purple-500' },
+  { icon: MapIcon,   label: 'Community Map',       to: '/community-map',    color: 'from-cyan-500 to-blue-500' },
+  { icon: Mic,       label: 'Voice Report',        to: '/report',           color: 'from-pink-500 to-rose-500' },
+  { icon: BarChart3, label: 'Analytics',           to: '/analytics',        color: 'from-amber-500 to-orange-500' },
+  { icon: Trophy,    label: 'Leaderboard',         to: '/leaderboard',      color: 'from-emerald-500 to-green-500' },
+  { icon: MessageSquare, label: 'AI Assistant',    to: '/assistant',        color: 'from-violet-500 to-purple-500' },
+];
+
+export default function CommunityDashboard() {
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
+
+  const [myIssues, setMyIssues] = useState<CommunityIssue[]>([]);
+  const [recentIssues, setRecentIssues] = useState<CommunityIssue[]>([]);
+  const [stats, setStats] = useState({ totalIssues: 0, resolvedIssues: 0, activeUsers: 0, categoryCounts: {} as Record<string, number> });
+  const [insights, setInsights] = useState<AICommunityInsight[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+
+  useEffect(() => {
+    loadData();
+  }, [user]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [statsData, recentData] = await Promise.all([
+        getCommunityStats(),
+        getIssues({ limitCount: 5 }),
+      ]);
+      setStats(statsData);
+      setRecentIssues(recentData.issues);
+
+      if (user) {
+        const myData = await getUserIssues(user.uid);
+        setMyIssues(myData);
+      }
+    } catch (e) {
+      console.error('Dashboard load error:', e);
+    }
+    setLoading(false);
+  };
+
+  const loadInsights = async () => {
+    if (recentIssues.length === 0) return;
+    setInsightsLoading(true);
+    try {
+      const data = await generateCommunityInsights(recentIssues);
+      setInsights(data);
+    } catch (e) {
+      console.error('Insights error:', e);
+    }
+    setInsightsLoading(false);
+  };
+
+  const resolutionRate = stats.totalIssues > 0
+    ? Math.round((stats.resolvedIssues / stats.totalIssues) * 100)
+    : 0;
+
+  const topCategories = Object.entries(stats.categoryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#06060a] text-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#06060a] text-white">
+      {/* Header */}
+      <div className="sticky top-0 z-50 backdrop-blur-xl bg-[#06060a]/80 border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+              GramSahay
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to="/report"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 rounded-full text-sm font-medium hover:from-indigo-400 hover:to-purple-500 transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              Report Issue
+            </Link>
+            <button
+              onClick={() => signOut().then(() => navigate('/'))}
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4 text-white/40" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Welcome */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-3xl font-bold mb-1">
+            Welcome, {profile?.name || user?.email?.split('@')[0] || 'Hero'} 👋
+          </h1>
+          <p className="text-white/40">
+            You have {profile?.points || 0} points · {myIssues.length} issues reported
+          </p>
+        </motion.div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: 'Total Issues', value: stats.totalIssues, icon: FileText, color: 'text-blue-400' },
+            { label: 'Resolved', value: stats.resolvedIssues, icon: CheckCircle2, color: 'text-emerald-400' },
+            { label: 'Resolution Rate', value: `${resolutionRate}%`, icon: TrendingUp, color: 'text-amber-400' },
+            { label: 'Active Citizens', value: stats.activeUsers, icon: Users, color: 'text-purple-400' },
+          ].map((stat, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]"
+            >
+              <stat.icon className={`w-5 h-5 ${stat.color} mb-3`} />
+              <p className="text-2xl font-bold text-white">{stat.value}</p>
+              <p className="text-xs text-white/30 mt-1">{stat.label}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {quickActions.map((action, i) => (
+              <Link
+                key={i}
+                to={action.to}
+                className="group p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-all text-center hover:bg-white/[0.04]"
+              >
+                <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                  <action.icon className="w-6 h-6 text-white" />
+                </div>
+                <p className="text-sm text-white/70">{action.label}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Recent Issues */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Recent Issues</h2>
+              <Link to="/issues" className="text-sm text-indigo-400 hover:text-indigo-300">View All →</Link>
+            </div>
+            {recentIssues.length === 0 ? (
+              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
+                <p className="text-white/40 mb-4">No issues reported yet</p>
+                <Link
+                  to="/report"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-2 rounded-full text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Report First Issue
+                </Link>
+              </div>
+            ) : (
+              recentIssues.map(issue => {
+                const catMeta = CATEGORIES.find(c => c.key === issue.category);
+                const statusMeta = STATUSES.find(s => s.key === issue.status);
+                return (
+                  <Link
+                    key={issue.id}
+                    to={`/issues/${issue.id}`}
+                    className="block p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="font-medium text-white/90 line-clamp-1">{issue.title}</h3>
+                        <p className="text-xs text-white/30 mt-1 line-clamp-1">{issue.description}</p>
+                      </div>
+                      <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] ${statusMeta?.bgColor} ${statusMeta?.color} border`}>
+                        {statusMeta?.label}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-3 text-xs text-white/20">
+                      <span className={catMeta?.color}>{catMeta?.label}</span>
+                      <span className="flex items-center gap-1"><ArrowUp className="w-3 h-3" />{issue.upvotes}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{timeAgo(issue.createdAt)}</span>
+                    </div>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* My Profile Card */}
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-lg font-bold">
+                  {(profile?.name?.[0] || 'U').toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-semibold text-white">{profile?.name || 'User'}</p>
+                  <p className="text-xs text-white/30">{profile?.role === 'citizen' ? '🛡️ Citizen' : `⭐ ${profile?.role}`}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div>
+                  <p className="text-lg font-bold text-indigo-400">{profile?.points || 0}</p>
+                  <p className="text-[10px] text-white/30">Points</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-emerald-400">{profile?.issuesReported || 0}</p>
+                  <p className="text-[10px] text-white/30">Reported</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-amber-400">{profile?.issuesResolved || 0}</p>
+                  <p className="text-[10px] text-white/30">Resolved</p>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Insights */}
+            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-indigo-400" />
+                  AI Insights
+                </h3>
+                <button
+                  onClick={loadInsights}
+                  disabled={insightsLoading}
+                  className="text-xs text-indigo-400 hover:text-indigo-300 disabled:opacity-30"
+                >
+                  {insightsLoading ? 'Generating...' : 'Generate'}
+                </button>
+              </div>
+
+              {insightsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-5 h-5 text-indigo-500 animate-spin" />
+                </div>
+              ) : insights.length > 0 ? (
+                <div className="space-y-3">
+                  {insights.map(insight => (
+                    <div key={insight.id} className="p-3 rounded-xl bg-white/[0.03]">
+                      <p className="text-xs font-medium text-white/70 mb-1">{insight.title}</p>
+                      <p className="text-xs text-white/40">{insight.description}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-white/20 text-center py-4">
+                  Click "Generate" to get AI-powered community insights
+                </p>
+              )}
+            </div>
+
+            {/* Top Categories */}
+            {topCategories.length > 0 && (
+              <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+                <h3 className="text-sm font-medium text-white/60 mb-4">Top Issue Categories</h3>
+                <div className="space-y-3">
+                  {topCategories.map(([cat, count]) => {
+                    const meta = CATEGORIES.find(c => c.key === cat);
+                    const pct = Math.round((count / stats.totalIssues) * 100);
+                    return (
+                      <div key={cat}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className={meta?.color || 'text-white/50'}>{meta?.label || cat}</span>
+                          <span className="text-white/30">{count} ({pct}%)</span>
+                        </div>
+                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 1, ease: 'easeOut' }}
+                            className="h-full bg-indigo-500 rounded-full"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

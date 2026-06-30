@@ -1,0 +1,123 @@
+# ── Dependencies ──────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── Build output ──────────────────────────────────────────────
+dist/
+dist-ssr/
+build/
+
+# ── Environment & Secrets (NEVER commit these) ───────────────
+.env
+.env.local
+.env.*.local
+*.local
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── Editor / IDE ──────────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+
+# ── OS files ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ── Firebase ──────────────────────────────────────────────────
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+ui-debug.log
+
+# ── Supabase (old, no longer used) ───────────────────────────
+supabase/.temp/
+
+# ── Package manager locks (keep only package-lock.json) ──────
+bun.lockb
+
+# ── Misc ──────────────────────────────────────────────────────
+*.tsbuildinfo
+.eslintcache
+coverage/
+
+# ── Old KisanMitra files (no longer part of GramSahay) ───────
+supabase/
+server/
+scripts/
+src/onboarding/
+src/integrations/
+src/stores/
+BACKEND_API.md
+FEATURES.md
+src/App.css
+
+# Old components
+src/components/ChatbotWidget.tsx
+src/components/CreditTracker.tsx
+src/components/CropAnalysisForm.tsx
+src/components/CropAnalysisReport.tsx
+src/components/DeviceConnectionDialog.tsx
+src/components/FarmerProfile.tsx
+src/components/GovernmentScheme.tsx
+src/components/LoanApplicationForm.tsx
+src/components/LoanApplicationList.tsx
+src/components/LocationAccessPopup.tsx
+src/components/MapPlanner.tsx
+src/components/SensorDataWidget.tsx
+src/components/LiveDataWidget.tsx
+src/components/LanguageSelector.tsx
+src/components/UserSettings.tsx
+src/components/charts/
+src/components/marketplace/
+src/components/onboarding/
+
+# Old pages
+src/pages/AskExpert.tsx
+src/pages/ColdChainSolution.tsx
+src/pages/CropAnalysis.tsx
+src/pages/CropCalendar.tsx
+src/pages/Dashboard.tsx
+src/pages/Demo.tsx
+src/pages/DroneMonitoring.tsx
+src/pages/FarmPlanner.tsx
+src/pages/Features.tsx
+src/pages/Index.tsx
+src/pages/JarvisAssistant.tsx
+src/pages/LivestockMonitoring.tsx
+src/pages/Loans.tsx
+src/pages/MarketPrices.tsx
+src/pages/Marketplace.tsx
+src/pages/Onboarding.tsx
+src/pages/OrganicCertification.tsx
+src/pages/Settings.tsx
+src/pages/SignIn.tsx
+src/pages/SignUp.tsx
+src/pages/Weather.tsx
+src/pages/features/
+
+# Old types/contexts
+src/types/crop-analysis.ts
+src/types/supabase.ts
+src/contexts/AuthContext.tsx
+src/contexts/LanguageContext.tsx
+src/lib/motion.tsx
+src/constants/
