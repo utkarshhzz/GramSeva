@@ -115,15 +115,15 @@ export default function HeroCanvas() {
   const text3Y = useTransform(scrollYProgress, [0.65, 0.8], [50, 0]);
 
   return (
-    <div ref={containerRef} className="relative h-[300vh] bg-[#06060a]">
+    <div ref={containerRef} className="relative h-[300vh] bg-background">
       {/* Sticky container that holds the canvas and text overlay */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         
         {/* Loading Indicator */}
         {loaded < 100 && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#06060a] transition-opacity duration-1000" style={{ opacity: loaded === 100 ? 0 : 1 }}>
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background transition-opacity duration-1000" style={{ opacity: loaded === 100 ? 0 : 1 }}>
             <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden mb-4">
-              <div className="h-full bg-yellow-500 transition-all duration-300" style={{ width: `${loaded}%` }} />
+              <div className="h-full bg-primary transition-all duration-300" style={{ width: `${loaded}%` }} />
             </div>
             <p className="text-white/40 text-sm font-medium tracking-widest uppercase">Initializing Experience... {loaded}%</p>
           </div>
@@ -135,23 +135,23 @@ export default function HeroCanvas() {
         />
 
         {/* Cinematic Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/80 via-transparent to-[#050505]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/40 to-background" />
         
         {/* Text 1: Initial Hook */}
         <motion.div 
           style={{ opacity: text1Opacity, y: text1Y }}
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-sm mb-8 backdrop-blur-md">
-            <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(234,179,8,0.8)]" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-sm mb-8 backdrop-blur-md">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--primary)]" />
             Powered by Google Gemini AI
           </div>
-          <p className="text-lg md:text-2xl text-yellow-500/80 font-medium mb-6 tracking-wide">
+          <p className="text-lg md:text-2xl text-primary/80 font-medium mb-6 tracking-wide">
             हर समस्या का समाधान, हर नागरिक की आवाज़
           </p>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-tight text-white drop-shadow-2xl">
             Your Community.<br />
-            <span className="bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+            <span className="text-primary">
               Your Voice.
             </span>
           </h1>
@@ -165,7 +165,7 @@ export default function HeroCanvas() {
         >
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-2xl max-w-4xl leading-tight">
             Report issues simply by speaking. <br/>
-            <span className="text-yellow-500/80">Let AI handle the rest.</span>
+            <span className="text-primary/80">Let AI handle the rest.</span>
           </h2>
           <p className="text-xl text-white/60 max-w-2xl font-light">
             From broken pipes to unlit streets, GramSahay automatically drafts formal complaints and routes them to the right authorities in seconds.
@@ -186,7 +186,7 @@ export default function HeroCanvas() {
           <div className="flex gap-4 pointer-events-auto">
              <Link
                 to="/sign-up"
-                className="flex items-center gap-2 bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 text-black px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-[1.05] shadow-[0_0_20px_rgba(234,179,8,0.4)]"
+                className="flex items-center gap-2 bg-primary text-black px-10 py-4 rounded-full text-lg font-bold transition-all hover:scale-[1.05]"
               >
                 Start Reporting
               </Link>
