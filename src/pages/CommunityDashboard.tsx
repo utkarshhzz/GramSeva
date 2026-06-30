@@ -283,7 +283,7 @@ export default function CommunityDashboard() {
                 <div className="flex items-center justify-center gap-3">
                   <Link
                     to="/report"
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 px-5 py-2 rounded-full text-sm hover:opacity-90"
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black px-5 py-2 rounded-full text-sm hover:brightness-110 font-bold"
                   >
                     <Plus className="w-4 h-4" />
                     Report First Issue

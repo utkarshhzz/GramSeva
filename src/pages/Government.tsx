@@ -36,7 +36,7 @@ const Government = () => {
       link: "https://pmkisan.gov.in/",
       category: "financial",
       icon: TrendingUp,
-      color: "bg-green-50 dark:bg-green-950",
+      color: "bg-transparent",
       popular: true
     },
     {
@@ -49,7 +49,7 @@ const Government = () => {
       link: "https://pmfby.gov.in/",
       category: "insurance",
       icon: Shield,
-      color: "bg-blue-50 dark:bg-blue-950",
+      color: "bg-transparent",
       popular: true
     },
     {
@@ -62,7 +62,7 @@ const Government = () => {
       link: "https://www.nabard.org/content.aspx?id=582",
       category: "credit",
       icon: CreditCard,
-      color: "bg-purple-50 dark:bg-purple-950",
+      color: "bg-transparent",
       popular: true
     },
     {
@@ -75,7 +75,7 @@ const Government = () => {
       link: "https://pgsindia-ncof.gov.in/pkvy/Index.aspx",
       category: "organic",
       icon: Leaf,
-      color: "bg-emerald-50 dark:bg-emerald-950"
+      color: "bg-transparent"
     },
     {
       title: "RKVY",
@@ -87,7 +87,7 @@ const Government = () => {
       link: "https://rkvy.nic.in/",
       category: "infrastructure",
       icon: Building2,
-      color: "bg-orange-50 dark:bg-orange-950"
+      color: "bg-transparent"
     },
     {
       title: "AGMARKNET",
@@ -99,7 +99,7 @@ const Government = () => {
       link: "https://agmarknet.gov.in/",
       category: "market",
       icon: BarChart3,
-      color: "bg-amber-50 dark:bg-amber-950"
+      color: "bg-transparent"
     },
     {
       title: "Soil Health Card",
@@ -111,7 +111,7 @@ const Government = () => {
       link: "https://soilhealth.dac.gov.in/",
       category: "infrastructure",
       icon: Leaf,
-      color: "bg-teal-50 dark:bg-teal-950"
+      color: "bg-transparent"
     },
     {
       title: "e-NAM",
@@ -123,7 +123,7 @@ const Government = () => {
       link: "https://www.enam.gov.in/",
       category: "market",
       icon: BarChart3,
-      color: "bg-indigo-50 dark:bg-indigo-950"
+      color: "bg-transparent"
     }
   ];
 
@@ -140,7 +140,7 @@ const Government = () => {
         link: rs.scheme_link !== 'NaN' ? rs.scheme_link : '#',
         category: "financial", // fallback
         icon: Building2,
-        color: "bg-blue-50 dark:bg-blue-950",
+        color: "bg-transparent",
         popular: false
       })));
     }
@@ -174,9 +174,9 @@ const Government = () => {
     <div className={`min-h-screen flex flex-col ${isHighContrast ? 'high-contrast' : ''}`}>
       <Header />
       
-      <main className="flex-grow bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <main className="flex-grow bg-background">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-900 dark:to-emerald-900 text-white py-16">
+        <div className="bg-card border-b border-white/5 py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex justify-center mb-6">
@@ -190,14 +190,14 @@ const Government = () => {
               <p className="text-xl md:text-2xl mb-2 font-medium">
                 Government Schemes for Farmers
               </p>
-              <p className="text-green-100 text-lg mb-8 max-w-2xl mx-auto">
+              <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
                 Explore and apply for various government schemes designed to support and empower farmers across India
               </p>
               
               <div className="relative max-w-2xl mx-auto">
                 <Search className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
                 <Input
-                  className="pl-12 pr-4 py-6 text-lg bg-white dark:bg-gray-800 border-0 shadow-xl"
+                  className="pl-12 pr-4 py-6 text-lg bg-background/50 border border-white/10 shadow-xl text-white"
                   placeholder="खोजें योजना... (Search for schemes...)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -210,17 +210,17 @@ const Government = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Stats Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 text-center">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">{realSchemes.length > 0 ? (realSchemes.length + schemes.length) : schemes.length}+</div>
-              <div className="text-gray-600 dark:text-gray-400">Active Schemes</div>
+            <div className="bg-card p-6 rounded-xl shadow-md border border-white/10 text-center">
+              <div className="text-3xl font-bold text-primary mb-2">{realSchemes.length > 0 ? (realSchemes.length + schemes.length) : schemes.length}+</div>
+              <div className="text-white/60">Active Schemes</div>
             </div>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 text-center">
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">₹50K+</div>
-              <div className="text-gray-600 dark:text-gray-400">Max Benefits/Year</div>
+            <div className="bg-card p-6 rounded-xl shadow-md border border-white/10 text-center">
+              <div className="text-3xl font-bold text-primary mb-2">₹50K+</div>
+              <div className="text-white/60">Max Benefits/Year</div>
             </div>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 text-center">
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">10M+</div>
-              <div className="text-gray-600 dark:text-gray-400">Farmers Benefited</div>
+            <div className="bg-card p-6 rounded-xl shadow-md border border-white/10 text-center">
+              <div className="text-3xl font-bold text-primary mb-2">10M+</div>
+              <div className="text-white/60">Farmers Benefited</div>
             </div>
           </div>
 
@@ -233,8 +233,8 @@ const Government = () => {
                   variant={selectedCategory === category.id ? "default" : "outline"}
                   className={`cursor-pointer px-4 py-2 text-sm transition-all ${
                     selectedCategory === category.id
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'bg-primary text-black hover:brightness-110'
+                      : 'border-white/20 text-white/70 hover:bg-white/10'
                   }`}
                   onClick={() => setSelectedCategory(category.id)}
                 >
@@ -246,8 +246,8 @@ const Government = () => {
           {/* Popular Schemes */}
           {selectedCategory === 'all' && searchTerm === '' && (
             <div className="mb-12">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-primary" />
                 लोकप्रिय योजनाएँ / Popular Schemes
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -272,7 +272,7 @@ const Government = () => {
           {/* All Schemes */}
           <div className="mb-12">
             {selectedCategory === 'all' && searchTerm === '' && (
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-2xl font-bold text-white mb-6">
                 सभी योजनाएँ / All Schemes
               </h2>
             )}
@@ -304,22 +304,22 @@ const Government = () => {
           
           {filteredSchemes.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-white/60">
                 कोई योजना नहीं मिली। कृपया अपनी खोज बदलें।
               </p>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-white/60">
                 No schemes found. Please try a different search.
               </p>
             </div>
           )}
 
           {/* Government Partners Section */}
-          <div className="mt-16 max-w-6xl mx-auto bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
+          <div className="mt-16 max-w-6xl mx-auto bg-card p-8 rounded-2xl shadow-xl border border-white/10">
             <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
                 हमारे सरकारी साझेदार
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-lg text-white/60">
                 Our Government Partners
               </p>
             </div>
@@ -335,7 +335,7 @@ const Government = () => {
               ].map((partner, index) => (
                 <div 
                   key={index} 
-                  className="flex flex-col items-center justify-center p-6 bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 dark:border-gray-600"
+                  className="flex flex-col items-center justify-center p-6 bg-background rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-white/5"
                 >
                   <img
                     src={partner.logo}
@@ -346,7 +346,7 @@ const Government = () => {
                       target.src = "https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg";
                     }}
                   />
-                  <p className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">
+                  <p className="text-xs font-medium text-white/70 text-center">
                     {partner.name}
                   </p>
                 </div>
@@ -355,23 +355,23 @@ const Government = () => {
           </div>
 
           {/* Help Section */}
-          <div className="mt-12 max-w-4xl mx-auto bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-900 dark:to-emerald-900 text-white p-8 rounded-2xl shadow-xl">
+          <div className="mt-12 max-w-4xl mx-auto bg-card border border-primary/20 text-white p-8 rounded-2xl shadow-[0_0_30px_rgba(196,168,124,0.1)]">
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-3">Need Help Applying?</h3>
-              <p className="text-green-100 mb-6">
+              <h3 className="text-2xl font-bold mb-3 text-primary">Need Help Applying?</h3>
+              <p className="text-white/70 mb-6">
                 Our team is here to assist you with scheme applications and documentation
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="bg-white text-green-600 hover:bg-gray-100 hover:text-green-700 font-semibold"
+                  className="bg-primary text-black hover:brightness-110 font-semibold"
                 >
                   Contact Support
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-2 border-white text-green-600 hover:bg-white hover:text-green-600 font-semibold"
+                  className="border-2 border-primary text-primary hover:bg-primary hover:text-black font-semibold"
                 >
                   View Guidelines
                 </Button>
