@@ -363,9 +363,10 @@ export default function ReportIssue() {
           {step === 'describe' && (
             <motion.div
               key="describe"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: 20, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -20, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="space-y-6"
             >
               <div>
@@ -410,7 +411,7 @@ export default function ReportIssue() {
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="e.g., Broken water pipeline on Main Road"
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                  className="w-full px-5 py-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all text-lg shadow-inner"
                 />
               </div>
 
@@ -422,7 +423,7 @@ export default function ReportIssue() {
                   onChange={e => setDescription(e.target.value)}
                   placeholder="Describe the issue in detail. What's the problem? How long has it been going on? Who is affected?"
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all resize-none"
+                  className="w-full px-5 py-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all resize-none text-lg shadow-inner"
                 />
               </div>
 
@@ -456,9 +457,10 @@ export default function ReportIssue() {
           {step === 'location' && (
             <motion.div
               key="location"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: 20, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -20, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="space-y-6"
             >
               <div>
@@ -475,7 +477,7 @@ export default function ReportIssue() {
               </button>
 
               {/* Map */}
-              <div className="rounded-2xl overflow-hidden border border-white/10 h-[300px] relative z-0">
+              <div className="rounded-3xl overflow-hidden border border-white/[0.06] shadow-2xl h-[400px] relative z-0">
                 <MapContainer
                   center={location ? [location.lat, location.lng] : [22.5937, 78.9629]}
                   zoom={location ? 15 : 5}
@@ -520,9 +522,10 @@ export default function ReportIssue() {
           {step === 'media' && (
             <motion.div
               key="media"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: 20, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -20, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="space-y-6"
             >
               <div>
@@ -587,9 +590,10 @@ export default function ReportIssue() {
           {step === 'ai_review' && (
             <motion.div
               key="ai_review"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: 20, scale: 0.98 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -20, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="space-y-6"
             >
               <div>

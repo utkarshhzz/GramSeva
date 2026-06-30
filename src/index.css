@@ -91,6 +91,9 @@
 
   body {
     @apply bg-background text-foreground font-poppins;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -102,22 +105,22 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Cinematic Dark */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #06060a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2E8B57;
+  background: #333340;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #006400;
+  background: #4f4f66;
 }
 
 /* High contrast mode */

@@ -235,14 +235,14 @@ export default function CommunityDashboard() {
           ].map((stat, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: i * 0.1, type: 'spring', stiffness: 100 }}
+              className="p-6 rounded-3xl bg-white/[0.01] border border-white/[0.03] backdrop-blur-xl hover:bg-white/[0.03] transition-colors"
             >
               <stat.icon className={`w-5 h-5 ${stat.color} mb-3`} />
-              <p className="text-2xl font-bold text-white">{stat.value}</p>
-              <p className="text-xs text-white/30 mt-1">{stat.label}</p>
+              <p className="text-3xl font-bold text-white tracking-tight">{stat.value}</p>
+              <p className="text-sm text-white/40 mt-2">{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -255,7 +255,7 @@ export default function CommunityDashboard() {
               <Link
                 key={i}
                 to={action.to}
-                className="group p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-all text-center hover:bg-white/[0.04]"
+                className="group p-5 rounded-3xl bg-white/[0.015] border border-white/[0.03] backdrop-blur-xl hover:border-white/[0.08] transition-all text-center hover:bg-white/[0.04] shadow-sm hover:shadow-xl hover:shadow-indigo-500/10"
               >
                 <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                   <action.icon className="w-6 h-6 text-white" />
@@ -294,19 +294,24 @@ export default function CommunityDashboard() {
                 </div>
               </div>
             ) : (
-              recentIssues.map(issue => {
+              recentIssues.map((issue, index) => {
                 const catMeta = CATEGORIES.find(c => c.key === issue.category);
                 const statusMeta = STATUSES.find(s => s.key === issue.status);
                 return (
-                  <Link
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
                     key={issue.id}
-                    to={`/issues/${issue.id}`}
-                    className="block p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/10 transition-all"
                   >
+                    <Link
+                      to={`/issues/${issue.id}`}
+                      className="block p-5 rounded-2xl bg-white/[0.015] border border-white/[0.04] hover:bg-white/[0.03] hover:border-white/[0.08] backdrop-blur-md transition-all shadow-lg hover:shadow-indigo-500/5 group"
+                    >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h3 className="font-medium text-white/90 line-clamp-1">{issue.title}</h3>
-                        <p className="text-xs text-white/30 mt-1 line-clamp-1">{issue.description}</p>
+                        <h3 className="text-lg font-medium text-white/90 line-clamp-1 group-hover:text-indigo-300 transition-colors">{issue.title}</h3>
+                        <p className="text-sm text-white/40 mt-1.5 line-clamp-2 leading-relaxed">{issue.description}</p>
                       </div>
                       <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] ${statusMeta?.bgColor} ${statusMeta?.color} border`}>
                         {statusMeta?.label}
@@ -316,8 +321,9 @@ export default function CommunityDashboard() {
                       <span className={catMeta?.color}>{catMeta?.label}</span>
                       <span className="flex items-center gap-1"><ArrowUp className="w-3 h-3" />{issue.upvotes}</span>
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{timeAgo(issue.createdAt)}</span>
-                    </div>
-                  </Link>
+                      </div>
+                    </Link>
+                  </motion.div>
                 );
               })
             )}
