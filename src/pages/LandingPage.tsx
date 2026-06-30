@@ -10,7 +10,7 @@ import {
   ArrowRight, ChevronDown, Star, CheckCircle2,
   Construction, Droplets, TreePine, Trash2,
   ShieldAlert, Building2, Globe, Award,
-  TrendingUp, Clock, MessageSquare,
+  TrendingUp, Clock, MessageSquare, Mail, FileText,
 } from 'lucide-react';
 import HeroCanvas from '../components/HeroCanvas';
 
@@ -65,41 +65,41 @@ const issueCategories = [
 
 const features = [
   {
-    icon: MapPin,
-    title: 'Pin Issues on Map',
-    desc: 'Report problems with exact GPS location. See a live heatmap of community issues in your area.',
-    gradient: 'from-violet-500 to-indigo-500',
+    icon: Shield,
+    title: 'Auto-Mail & Complaint Drafts',
+    desc: 'Gemini AI automatically drafts formal complaint letters and identifies the correct municipal authority for your specific issue.',
+    gradient: 'from-yellow-500 to-yellow-300',
+  },
+  {
+    icon: Building2,
+    title: 'AI Government Schemes Matching',
+    desc: 'Discover state and central government schemes personalized for you using our smart AI matching engine.',
+    gradient: 'from-yellow-600 to-yellow-400',
   },
   {
     icon: Mic,
     title: 'Voice-First Reporting',
-    desc: 'Just speak in Hindi, English, or Kannada. Our AI transcribes, classifies, and files the report automatically.',
-    gradient: 'from-pink-500 to-rose-500',
+    desc: 'Report issues instantly by speaking in Hindi, English, or Kannada. Our AI transcribes and files it seamlessly.',
+    gradient: 'from-amber-500 to-yellow-500',
   },
   {
-    icon: Shield,
-    title: 'AI Issue Classification',
-    desc: 'Gemini AI auto-categorizes issues, assesses severity, identifies the right authority, and drafts formal complaints.',
-    gradient: 'from-amber-500 to-orange-500',
+    icon: MapPin,
+    title: 'Live Heatmaps',
+    desc: 'Report problems with exact GPS location. See a live heatmap of community issues in your area.',
+    gradient: 'from-yellow-700 to-amber-500',
   },
   {
-    icon: BarChart3,
-    title: 'Community Analytics',
-    desc: 'Track resolution rates, identify problem hotspots, and see AI-generated insights about your community.',
-    gradient: 'from-cyan-500 to-blue-500',
+    icon: MessageSquare,
+    title: 'Multilingual AI Assistant',
+    desc: 'Chat with our AI in your native language to get guidance on reporting issues or applying for schemes.',
+    gradient: 'from-yellow-400 to-yellow-200',
   },
   {
-    icon: Users,
-    title: 'Community Heroes',
-    desc: 'Earn points and badges for reporting and resolving issues. Climb the leaderboard and become your community\'s hero.',
-    gradient: 'from-emerald-500 to-green-500',
-  },
-  {
-    icon: Globe,
-    title: 'Multilingual Support',
-    desc: 'Full support for Hindi, English, and Kannada. Breaking language barriers for rural communities.',
-    gradient: 'from-purple-500 to-violet-500',
-  },
+    icon: FileText,
+    title: 'End-to-End Audit Trail',
+    desc: 'Every issue is tracked from reporting to resolution with full transparency and community upvoting.',
+    gradient: 'from-amber-600 to-yellow-600',
+  }
 ];
 
 const howItWorks = [
@@ -279,16 +279,129 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -6 }}
-                className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:border-primary/30 transition-all hover:bg-white/[0.04]"
+                whileHover={{ y: -6, scale: 1.02 }}
+                className="group relative p-8 rounded-3xl bg-card border border-white/10 hover:border-primary/50 transition-all shadow-lg hover:shadow-[0_0_30px_rgba(234,179,8,0.15)]"
               >
-                <div className={`w-12 h-12 rounded-xl bg-white/[0.05] border border-white/10 group-hover:border-primary/50 flex items-center justify-center mb-5 group-hover:scale-110 transition-all shadow-inner`}>
-                  <feature.icon className="w-6 h-6 text-white/50 group-hover:text-primary transition-colors" />
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(234,179,8,0.3)]`}>
+                  <feature.icon className="w-7 h-7 text-black" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                <p className="text-white/40 leading-relaxed text-sm">{feature.desc}</p>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">{feature.title}</h3>
+                <p className="text-white/60 leading-relaxed text-sm">{feature.desc}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Platform Ecosystem (Bento Box Showcase) ───────────────────────── */}
+      <section className="py-24 relative">
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <p className="text-primary text-sm font-bold mb-3 uppercase tracking-widest">Ecosystem</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                Everything You Need, In One Place
+              </span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Bento 1: Report */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.02 }}
+              className="md:col-span-2 p-8 rounded-[2rem] bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-white/10 hover:border-primary/50 transition-all flex flex-col md:flex-row items-center gap-8 group shadow-xl hover:shadow-[0_0_40px_rgba(234,179,8,0.2)]"
+            >
+              <div className="flex-1">
+                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
+                  <Mic className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Report Issues Instantly</h3>
+                <p className="text-white/60 mb-6">Use voice or text to report local problems. Our AI instantly drafts a formal letter to the correct authority.</p>
+                <Link to="/report" className="text-primary font-bold hover:underline flex items-center gap-2">
+                  Try Reporting <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="w-full md:w-1/2 aspect-video rounded-2xl bg-black/50 border border-white/5 flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 rounded-full bg-primary/20 animate-pulse flex items-center justify-center">
+                   <Mic className="w-10 h-10 text-primary" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Bento 2: Government Schemes */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ scale: 1.02 }}
+              className="p-8 rounded-[2rem] bg-card border border-white/10 hover:border-primary/50 transition-all group shadow-xl hover:shadow-[0_0_40px_rgba(234,179,8,0.2)]"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
+                <Building2 className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Government Schemes</h3>
+              <p className="text-white/60 mb-6 text-sm">Discover and apply for schemes perfectly matched to your demographic.</p>
+              <Link to="/government" className="text-primary font-bold hover:underline flex items-center gap-2 text-sm mt-auto">
+                Explore Schemes <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+
+            {/* Bento 3: AI Assistant */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              whileHover={{ scale: 1.02 }}
+              className="p-8 rounded-[2rem] bg-card border border-white/10 hover:border-primary/50 transition-all group shadow-xl hover:shadow-[0_0_40px_rgba(234,179,8,0.2)]"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
+                <MessageSquare className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">AI Assistant</h3>
+              <p className="text-white/60 mb-6 text-sm">24/7 multilingual support answering your questions and guiding you.</p>
+              <Link to="/assistant" className="text-primary font-bold hover:underline flex items-center gap-2 text-sm mt-auto">
+                Chat Now <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+
+            {/* Bento 4: Analytics Map */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              whileHover={{ scale: 1.02 }}
+              className="md:col-span-2 p-8 rounded-[2rem] bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-white/10 hover:border-primary/50 transition-all flex flex-col md:flex-row-reverse items-center gap-8 group shadow-xl hover:shadow-[0_0_40px_rgba(234,179,8,0.2)]"
+            >
+              <div className="flex-1">
+                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
+                  <MapPin className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Community Live Map</h3>
+                <p className="text-white/60 mb-6">View live issue heatmaps, track neighborhood analytics, and see which areas need the most help.</p>
+                <Link to="/community-map" className="text-primary font-bold hover:underline flex items-center gap-2">
+                  View Heatmap <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="w-full md:w-1/2 aspect-video rounded-2xl bg-black/50 border border-white/5 flex flex-col items-center justify-center overflow-hidden gap-3">
+                 <div className="flex items-end gap-2 h-20">
+                    <div className="w-4 bg-primary/40 h-8 rounded-t-sm" />
+                    <div className="w-4 bg-primary/60 h-12 rounded-t-sm" />
+                    <div className="w-4 bg-primary h-20 rounded-t-sm" />
+                    <div className="w-4 bg-primary/80 h-16 rounded-t-sm" />
+                 </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>

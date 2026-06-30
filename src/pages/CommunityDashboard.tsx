@@ -1,27 +1,26 @@
 // ============================================================
-// GramSahay — Community Dashboard
+// GramSahay — Community Dashboard (Bento-Box Redesign)
 // ============================================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import gsap from 'gsap';
-import { useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import ParticleSphere3D from '@/components/ParticleSphere3D';
 import {
-  MapPin, Plus, BarChart3, Trophy, Users, MessageSquare,
-  Shield, ArrowUp, Clock, TrendingUp, AlertTriangle,
-  CheckCircle2, Loader2, LogOut, Settings, Sparkles,
-  Construction, Droplets, Zap, Trash2, ShieldAlert,
-  TreePine, Map as MapIcon, Mic, FileText, Database, Building2,
+  Plus, BarChart3, Trophy, Users, MessageSquare,
+  Shield, ArrowUp, Clock, TrendingUp, CheckCircle2,
+  Loader2, LogOut, Sparkles, Map as MapIcon, Mic,
+  FileText, Database, Building2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getIssues, getUserIssues, getCommunityStats, createIssue } from '@/lib/firestore';
 import LanguageSelector from '@/components/LanguageSelector';
 import { generateCommunityInsights } from '@/lib/gemini';
-import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
+import { CATEGORIES, STATUSES } from '@/types/community';
 import type { CommunityIssue, AICommunityInsight } from '@/types/community';
 import FloatingChatbot from '@/components/FloatingChatbot';
 
@@ -34,21 +33,16 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-// Note: We use quickActions array directly in the render method now so it can access translate()
-
 export default function CommunityDashboard() {
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
   const { translate } = useLanguage();
 
   const quickActions = [
-    { icon: Plus,      label: translate('reportIssue'),       to: '/report',           color: 'from-yellow-600 to-yellow-400' },
-    { icon: MapIcon,   label: translate('communityMap'),       to: '/community-map',    color: 'from-yellow-500 to-amber-600' },
-    { icon: Mic,       label: translate('voiceReport'),        to: '/report',           color: 'from-amber-400 to-orange-500' },
-    { icon: BarChart3, label: translate('analytics'),           to: '/analytics',        color: 'from-orange-500 to-red-500' },
-    { icon: Trophy,    label: translate('leaderboard'),         to: '/leaderboard',      color: 'from-yellow-600 to-amber-500' },
-    { icon: MessageSquare, label: translate('aiAssistant'),    to: '/assistant',        color: 'from-amber-600 to-yellow-600' },
-    { icon: Building2, label: translate('govSchemes'),         to: '/government',          color: 'from-yellow-500 to-yellow-700' },
+    { icon: Plus,      label: translate('reportIssue'),       to: '/report',           color: 'from-yellow-500 to-amber-500' },
+    { icon: Building2, label: translate('govSchemes'),         to: '/government',       color: 'from-amber-600 to-yellow-600' },
+    { icon: MapIcon,   label: translate('communityMap'),       to: '/community-map',    color: 'from-yellow-400 to-yellow-600' },
+    { icon: Trophy,    label: translate('leaderboard'),         to: '/leaderboard',      color: 'from-orange-500 to-amber-600' },
   ];
 
   const [myIssues, setMyIssues] = useState<CommunityIssue[]>([]);
@@ -79,15 +73,11 @@ export default function CommunityDashboard() {
     try {
       const [statsData, recentData] = await Promise.all([
         getCommunityStats(),
-        getIssues({ limitCount: 5 }),
+        getIssues({ limitCount: 4 }),
       ]);
       setStats(statsData);
       setRecentIssues(recentData.issues);
-
-      if (user) {
-        const myData = await getUserIssues(user.uid);
-        setMyIssues(myData);
-      }
+      if (user) setMyIssues(await getUserIssues(user.uid));
     } catch (e) {
       console.error('Dashboard load error:', e);
     }
@@ -119,28 +109,19 @@ export default function CommunityDashboard() {
           description: "There is a massive water leak on the main road causing flooding and water wastage for the past 2 days.",
           category: "water" as any,
           severity: "high" as any,
-          location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
+          location: { lat: 22.5937, lng: 78.9629 },
           address: "Ward 4, Near Main Bazaar",
-          aiComplaintDraft: "To the Municipal Corporation Water Department,\n\nSubject: Urgent - Broken Water Pipeline Causing Flooding in Ward 4\n\nRespected Sir/Madam,\n\nI am writing to bring to your urgent attention a massive water leak on the main road in Ward 4, near the Main Bazaar. This pipeline rupture has been ongoing for the past two days, resulting in significant water wastage and localized flooding that is severely inconveniencing residents and commuters.\n\nGiven the current water scarcity challenges, such continuous wastage is alarming. Additionally, the stagnant water poses a risk of structural damage to the road and potential health hazards due to mosquito breeding.\n\nI kindly request you to dispatch a maintenance team immediately to assess and repair the broken pipeline. Your prompt action will prevent further loss of our precious water resources and restore normalcy in the area.\n\nThank you for your anticipated cooperation.\n\nYours faithfully,\nConcerned Citizen",
-        },
-        {
-          title: "Streetlights not working",
-          description: "The streetlights near the community center have been out for a week. It's unsafe at night.",
-          category: "electricity" as any,
-          severity: "medium" as any,
-          location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
-          address: "Community Center Road",
-          aiComplaintDraft: "To the State Electricity Board,\n\nSubject: Non-functional Streetlights on Community Center Road\n\nRespected Sir/Madam,\n\nI wish to report that the streetlights along the Community Center Road have been completely non-functional for the past week. This stretch of road is heavily used by pedestrians and vehicles, and the total darkness after sunset has created a significant safety hazard.\n\nResidents, particularly women and the elderly, are finding it unsafe to commute during the evening hours. The lack of illumination also increases the risk of accidents and petty crimes in the vicinity.\n\nI urgently request you to kindly arrange for a technician to inspect and repair the faulty streetlights at the earliest. Restoring proper lighting is essential for the safety and security of our neighborhood.\n\nThank you for your prompt assistance in this matter.\n\nYours sincerely,\nConcerned Citizen",
+          aiComplaintDraft: "To the Municipal Corporation...",
         },
         {
           title: "Illegal Garbage Dumping",
-          description: "People are dumping garbage in the empty plot next to the school. The smell is unbearable.",
+          description: "People are dumping garbage in the empty plot next to the school.",
           category: "sanitation" as any,
           severity: "critical" as any,
           status: "resolved" as any,
-          location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
+          location: { lat: 22.59, lng: 78.96 },
           address: "Plot 42, School Lane",
-          aiComplaintDraft: "To the Municipal Corporation Sanitation Department,\n\nSubject: Critical - Illegal Garbage Dumping Next to School in Plot 42\n\nRespected Sir/Madam,\n\nI am writing to file a formal complaint regarding the rampant and illegal dumping of garbage in the empty plot (Plot 42) situated directly adjacent to the local school on School Lane. The accumulated waste has created an unbearable stench and is rapidly becoming a serious health hazard for the students and nearby residents.\n\nThis unhygienic environment is attracting stray animals, flies, and mosquitoes, directly threatening the health and well-being of young children attending the school daily. This violation of public health standards requires immediate intervention.\n\nI urge the municipal authorities to clear the accumulated garbage without delay, sanitize the area, and implement measures (such as warning signs or penalizing offenders) to prevent future dumping at this site. Protecting the health of our students must be a priority.\n\nThank you for your immediate action.\n\nYours faithfully,\nConcerned Citizen",
+          aiComplaintDraft: "To the Sanitation Dept...",
         }
       ];
 
@@ -157,21 +138,20 @@ export default function CommunityDashboard() {
           location: issue.location,
           address: issue.address,
           ward: 'Demo Ward',
-          images: ['https://images.unsplash.com/photo-1518770660439-4636190af475'],
+          images: [],
           aiCategory: issue.category,
           aiSeverity: issue.severity,
-          aiSummary: 'Auto-generated dummy issue for demo purposes.',
-          aiSuggestions: ['Dispatch team immediately', 'Assess damage', 'Inform community'],
+          aiSummary: 'Auto-generated dummy issue.',
+          aiSuggestions: [],
           aiAuthority: 'Local Municipal Corporation',
           aiComplaintDraft: issue.aiComplaintDraft,
-          acknowledgedAt: issue.status === 'in-progress' || issue.status === 'resolved' ? new Date().toISOString() : null,
+          acknowledgedAt: null,
           resolvedAt: issue.status === 'resolved' ? new Date().toISOString() : null,
         });
       }
       await loadData();
     } catch (e) {
       console.error("Seed error:", e);
-      alert("Failed to seed data. Check console.");
     }
     setLoading(false);
   };
@@ -182,12 +162,18 @@ export default function CommunityDashboard() {
 
   const topCategories = Object.entries(stats.categoryCounts)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 4);
+    .slice(0, 4)
+    .map(([name, value]) => ({
+       name: CATEGORIES.find(c => c.key === name)?.label || name, 
+       value 
+    }));
+
+  const COLORS = ['#EAB308', '#F59E0B', '#D97706', '#B45309'];
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#06060a] text-white flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />
       </div>
     );
   }
@@ -203,262 +189,214 @@ export default function CommunityDashboard() {
 
       <div className="relative z-10">
         {/* Header */}
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-[#050505]/80 border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-black" />
-            </div>
-            <span className="text-xl font-bold text-white">
-              GramSahay
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <div className="dark">
-              <LanguageSelector />
-            </div>
-            <Link
-              to="/report"
-              className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-600 to-yellow-500 px-4 py-2 rounded-full text-sm font-bold text-black hover:brightness-110 transition-all shadow-[0_0_15px_rgba(234,179,8,0.2)]"
-            >
-              <Plus className="w-4 h-4" />
-              {translate('reportIssue')}
+        <div className="sticky top-0 z-50 backdrop-blur-2xl bg-[#050505]/70 border-b border-white/5">
+          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-black" />
+              </div>
+              <span className="text-xl font-bold text-white">GramSahay</span>
             </Link>
-            <button
-              onClick={() => signOut().then(() => navigate('/'))}
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4 text-white/40" />
-            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="dark"><LanguageSelector /></div>
+              <Link
+                to="/report"
+                className="flex items-center gap-1.5 bg-yellow-500 px-4 py-2 rounded-full text-sm font-bold text-black hover:brightness-110 shadow-[0_0_15px_rgba(234,179,8,0.3)] transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                {translate('reportIssue')}
+              </Link>
+              <button
+                onClick={() => signOut().then(() => navigate('/'))}
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4 text-white/40" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div ref={containerRef} className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        {/* Welcome */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-3xl font-bold mb-1">
-            {translate('welcomeHero')}, {profile?.name || user?.email?.split('@')[0] || 'Hero'} 👋
-          </h1>
-          <p className="text-white/40">
-            You have {profile?.points || 0} points · {myIssues.length} issues reported
-          </p>
-        </motion.div>
+        <div ref={containerRef} className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[minmax(140px,auto)]">
+          
+          {/* Bento 1: Profile (md:col-span-4, row-span-2) */}
+          <motion.div 
+            whileHover={{ scale: 1.02, rotateY: 2 }}
+            style={{ transformPerspective: 1000 }}
+            className="md:col-span-4 md:row-span-2 p-8 rounded-[2rem] bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-white/10 shadow-xl hover:shadow-[0_0_40px_rgba(234,179,8,0.15)] transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center text-2xl font-bold text-black mb-6 shadow-lg shadow-yellow-500/20">
+                {(profile?.name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+              </div>
+              <h2 className="text-2xl font-bold mb-1">{translate('welcomeHero')},</h2>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-amber-200 bg-clip-text text-transparent mb-2">
+                {profile?.name || user?.email?.split('@')[0] || 'Hero'}
+              </h1>
+              <p className="text-white/40 text-sm">{profile?.role === 'citizen' ? '🛡️ Active Citizen' : `⭐ ${profile?.role}`}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-white/5">
+              <div>
+                <p className="text-3xl font-bold text-white">{profile?.points || 0}</p>
+                <p className="text-xs text-yellow-500 uppercase tracking-widest font-bold mt-1">Points</p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-white">{myIssues.length}</p>
+                <p className="text-xs text-white/40 uppercase tracking-widest font-bold mt-1">Reported</p>
+              </div>
+            </div>
+          </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: translate('totalIssues'), value: stats.totalIssues, icon: FileText, color: 'text-blue-400' },
-            { label: translate('resolved'), value: stats.resolvedIssues, icon: CheckCircle2, color: 'text-emerald-400' },
-            { label: translate('resolutionRate'), value: `${resolutionRate}%`, icon: TrendingUp, color: 'text-amber-400' },
-            { label: translate('activeCitizens'), value: stats.activeUsers, icon: Users, color: 'text-purple-400' },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: i * 0.1, type: 'spring', stiffness: 100 }}
-              whileHover={{ scale: 1.05, rotateX: 5, rotateY: 5, zIndex: 10 }}
-              style={{ transformPerspective: 1000 }}
-              className="p-6 rounded-3xl bg-card border border-white/10 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.15)] transition-all duration-300"
-            >
-              <stat.icon className={`w-5 h-5 ${stat.color} mb-3`} />
-              <p className="text-3xl font-bold text-white tracking-tight">{stat.value}</p>
-              <p className="text-sm text-white/40 mt-2">{stat.label}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">{translate('quickActions')}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Bento 2: Quick Actions (md:col-span-8) */}
+          <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6">
             {quickActions.map((action, i) => (
-              <motion.div key={i} whileHover={{ scale: 1.05, rotateX: -5, rotateY: 5 }} style={{ transformPerspective: 800 }}>
+              <motion.div key={i} whileHover={{ scale: 1.05, y: -5 }} className="h-full">
                 <Link
                   to={action.to}
-                  className="block group p-5 rounded-3xl bg-card border border-white/10 hover:border-primary/50 transition-all text-center shadow-sm hover:shadow-[0_0_25px_rgba(234,179,8,0.2)] h-full"
+                  className="flex flex-col items-center justify-center h-full p-6 rounded-[2rem] bg-card border border-white/10 hover:border-yellow-500/50 hover:bg-white/[0.02] transition-all group shadow-lg"
                 >
-                  <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-inner`}>
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner`}>
                     <action.icon className="w-6 h-6 text-black" />
                   </div>
-                  <p className="text-sm font-medium text-white/70 group-hover:text-yellow-400 transition-colors">{action.label}</p>
+                  <p className="text-sm font-bold text-white/70 group-hover:text-yellow-400 transition-colors text-center">{action.label}</p>
                 </Link>
               </motion.div>
             ))}
           </div>
-        </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Recent Issues */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{translate('recentIssues')}</h2>
-              <Link to="/issues" className="text-sm text-indigo-400 hover:text-indigo-300">View All →</Link>
+          {/* Bento 3: Global Stats (md:col-span-4) */}
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="md:col-span-4 p-8 rounded-[2rem] bg-card border border-white/10 shadow-xl flex items-center justify-between"
+          >
+            <div>
+              <p className="text-sm text-white/40 font-bold uppercase tracking-widest mb-2">Resolution Rate</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-bold text-yellow-500">{resolutionRate}%</span>
+                <TrendingUp className="w-6 h-6 text-yellow-500/50" />
+              </div>
             </div>
-            {recentIssues.length === 0 ? (
-              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
-                <p className="text-white/40 mb-4">No issues reported yet</p>
-                <div className="flex items-center justify-center gap-3">
-                  <Link
-                    to="/report"
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black px-5 py-2 rounded-full text-sm hover:brightness-110 font-bold"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Report First Issue
-                  </Link>
-                  <button
-                    onClick={seedDummyData}
-                    className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-5 py-2 rounded-full text-sm transition-colors"
-                  >
-                    <Database className="w-4 h-4" />
-                    Seed Demo Data
-                  </button>
-                </div>
+            <div className="w-16 h-16 rounded-full border-4 border-yellow-500/20 border-t-yellow-500 animate-spin-slow flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6 text-yellow-500" />
+            </div>
+          </motion.div>
+
+          {/* Bento 4: Categories Chart (md:col-span-4) */}
+          <motion.div 
+             whileHover={{ scale: 1.02 }}
+             className="md:col-span-4 p-6 rounded-[2rem] bg-card border border-white/10 shadow-xl flex flex-col"
+          >
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white/40 mb-4">Top Categories</h3>
+            {topCategories.length > 0 ? (
+              <div className="flex-1 min-h-[150px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={topCategories} innerRadius={40} outerRadius={60} paddingAngle={5} dataKey="value" stroke="none">
+                      {topCategories.map((_, i) => <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                      itemStyle={{ color: '#EAB308', fontWeight: 'bold' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             ) : (
-              recentIssues.map((issue, index) => {
-                const catMeta = CATEGORIES.find(c => c.key === issue.category);
-                const statusMeta = STATUSES.find(s => s.key === issue.status);
-                return (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    key={issue.id}
-                  >
-                    <Link
-                      to={`/issues/${issue.id}`}
-                      className="block p-5 rounded-2xl bg-card border border-white/10 hover:border-primary/30 transition-all shadow-lg hover:shadow-[0_0_20px_rgba(234,179,8,0.1)] group"
-                    >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h3 className="text-lg font-medium text-white/90 line-clamp-1 group-hover:text-yellow-400 transition-colors">{issue.title}</h3>
-                        <p className="text-sm text-white/40 mt-1.5 line-clamp-2 leading-relaxed">{issue.description}</p>
-                      </div>
-                      <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] ${statusMeta?.bgColor} ${statusMeta?.color} border`}>
-                        {statusMeta?.label}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 mt-3 text-xs text-white/20">
-                      <span className={catMeta?.color}>{catMeta?.label}</span>
-                      <span className="flex items-center gap-1"><ArrowUp className="w-3 h-3" />{issue.upvotes}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{timeAgo(issue.createdAt)}</span>
-                      </div>
-                    </Link>
-                  </motion.div>
-                );
-              })
+              <div className="flex-1 flex items-center justify-center text-white/20 text-sm">No data yet</div>
             )}
-          </div>
+          </motion.div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* My Profile Card */}
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#111] to-[#0a0a0a] border border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.1)]">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center text-lg font-bold text-black">
-                  {(profile?.name?.[0] || 'U').toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-semibold text-white">{profile?.name || 'User'}</p>
-                  <p className="text-xs text-white/30">{profile?.role === 'citizen' ? '🛡️ Citizen' : `⭐ ${profile?.role}`}</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div>
-                  <p className="text-lg font-bold text-yellow-500">{profile?.points || 0}</p>
-                  <p className="text-[10px] text-white/30">Points</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-white/80">{profile?.issuesReported || 0}</p>
-                  <p className="text-[10px] text-white/30">Reported</p>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-amber-400">{profile?.issuesResolved || 0}</p>
-                  <p className="text-[10px] text-white/30">Resolved</p>
-                </div>
-              </div>
-            </div>
-
-            {/* AI Insights */}
-            <div className="p-5 rounded-2xl bg-card border border-white/10 hover:border-primary/30 transition-colors">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium flex items-center gap-2 text-yellow-500">
-                  <Sparkles className="w-4 h-4" />
-                  AI Insights
+          {/* Bento 5: AI Insights (md:col-span-8, row-span-2) */}
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="md:col-span-8 md:row-span-2 p-8 rounded-[2rem] bg-gradient-to-br from-card to-background border border-white/10 shadow-xl flex flex-col"
+          >
+             <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold flex items-center gap-2 text-yellow-500">
+                  <Sparkles className="w-5 h-5" />
+                  AI Community Insights
                 </h3>
                 <button
                   onClick={loadInsights}
                   disabled={insightsLoading}
-                  className="text-xs text-yellow-600 hover:text-yellow-400 disabled:opacity-30"
+                  className="px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-500 text-sm font-bold hover:bg-yellow-500/20 transition-colors disabled:opacity-50"
                 >
-                  {insightsLoading ? 'Generating...' : 'Generate'}
+                  {insightsLoading ? 'Analyzing...' : 'Generate New'}
                 </button>
               </div>
-
-              {insightsLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />
-                </div>
-              ) : insights.length > 0 ? (
-                <div className="space-y-3">
-                  {insights.map(insight => (
-                    <div key={insight.id} className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
-                      <p className="text-xs font-medium text-white/70 mb-1">{insight.title}</p>
-                      <p className="text-xs text-white/40">{insight.description}</p>
+              
+              <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+                {insightsLoading ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-yellow-500/50">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <p className="text-sm font-medium">Gemini is analyzing reports...</p>
+                  </div>
+                ) : insights.length > 0 ? (
+                  insights.map(insight => (
+                    <div key={insight.id} className="p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-yellow-500/30 transition-colors">
+                      <p className="text-sm font-bold text-white mb-2">{insight.title}</p>
+                      <p className="text-sm text-white/60 leading-relaxed">{insight.description}</p>
                     </div>
-                  ))}
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-white/20">
+                     <Sparkles className="w-10 h-10 opacity-20" />
+                     <p className="text-sm">Click Generate to get AI insights about your community.</p>
+                  </div>
+                )}
+              </div>
+          </motion.div>
+
+          {/* Bento 6: Recent Issues (md:col-span-4, row-span-2) */}
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            className="md:col-span-4 md:row-span-2 p-6 rounded-[2rem] bg-card border border-white/10 shadow-xl flex flex-col"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-white/40">Recent Reports</h2>
+              <Link to="/issues" className="text-xs text-yellow-500 hover:underline font-bold">View All</Link>
+            </div>
+            
+            <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+              {recentIssues.length === 0 ? (
+                <div className="text-center py-10">
+                   <p className="text-white/40 text-sm mb-4">No issues yet</p>
+                   <button onClick={seedDummyData} className="text-xs font-bold bg-white/10 px-4 py-2 rounded-full hover:bg-white/20">Seed Demo Data</button>
                 </div>
               ) : (
-                <p className="text-xs text-white/20 text-center py-4">
-                  Click "Generate" to get AI-powered community insights
-                </p>
+                recentIssues.map((issue) => {
+                  const catMeta = CATEGORIES.find(c => c.key === issue.category);
+                  const statusMeta = STATUSES.find(s => s.key === issue.status);
+                  return (
+                    <Link
+                      key={issue.id}
+                      to={`/issues/${issue.id}`}
+                      className="block p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-yellow-500/30 hover:bg-white/[0.05] transition-all group"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                         <h3 className="text-sm font-bold text-white/90 line-clamp-1 group-hover:text-yellow-400">{issue.title}</h3>
+                         <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-bold ${statusMeta?.bgColor} ${statusMeta?.color}`}>
+                           {statusMeta?.label}
+                         </span>
+                      </div>
+                      <p className="text-xs text-white/40 line-clamp-2 mb-3">{issue.description}</p>
+                      <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-white/30">
+                         <span className={catMeta?.color}>{catMeta?.label}</span>
+                         <span className="flex items-center gap-1"><ArrowUp className="w-3 h-3" />{issue.upvotes}</span>
+                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{timeAgo(issue.createdAt)}</span>
+                      </div>
+                    </Link>
+                  )
+                })
               )}
             </div>
+          </motion.div>
 
-            {/* Top Categories */}
-            {topCategories.length > 0 && (
-              <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-                <h3 className="text-sm font-medium text-white/60 mb-4">Top Issue Categories</h3>
-                <div className="space-y-3">
-                  {topCategories.map(([cat, count]) => {
-                    const meta = CATEGORIES.find(c => c.key === cat);
-                    const pct = Math.round((count / stats.totalIssues) * 100);
-                    return (
-                      <div key={cat}>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className={meta?.color || 'text-white/50'}>{meta?.label || cat}</span>
-                          <span className="text-white/30">{count} ({pct}%)</span>
-                        </div>
-                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${pct}%` }}
-                            transition={{ duration: 1, ease: 'easeOut' }}
-                            className="h-full bg-yellow-500 rounded-full"
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
       
-      {/* Floating Chatbot */}
       <FloatingChatbot />
-      </div>
     </div>
   );
 }
