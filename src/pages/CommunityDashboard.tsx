@@ -13,6 +13,7 @@ import {
   TreePine, Map as MapIcon, Mic, FileText, Database, Building2,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { getIssues, getUserIssues, getCommunityStats, createIssue } from '@/lib/firestore';
 import LanguageSelector from '@/components/LanguageSelector';
 import { generateCommunityInsights } from '@/lib/gemini';
@@ -28,19 +29,22 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-const quickActions = [
-  { icon: Plus,      label: 'Report Issue',       to: '/report',           color: 'from-indigo-500 to-purple-500' },
-  { icon: MapIcon,   label: 'Community Map',       to: '/community-map',    color: 'from-cyan-500 to-blue-500' },
-  { icon: Mic,       label: 'Voice Report',        to: '/report',           color: 'from-pink-500 to-rose-500' },
-  { icon: BarChart3, label: 'Analytics',           to: '/analytics',        color: 'from-amber-500 to-orange-500' },
-  { icon: Trophy,    label: 'Leaderboard',         to: '/leaderboard',      color: 'from-emerald-500 to-green-500' },
-  { icon: MessageSquare, label: 'AI Assistant',    to: '/assistant',        color: 'from-violet-500 to-purple-500' },
-  { icon: Building2, label: 'Gov Schemes',         to: '/government',          color: 'from-blue-500 to-cyan-500' },
-];
+// Note: We use quickActions array directly in the render method now so it can access translate()
 
 export default function CommunityDashboard() {
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
+  const { translate } = useLanguage();
+
+  const quickActions = [
+    { icon: Plus,      label: translate('reportIssue'),       to: '/report',           color: 'from-indigo-500 to-purple-500' },
+    { icon: MapIcon,   label: translate('communityMap'),       to: '/community-map',    color: 'from-cyan-500 to-blue-500' },
+    { icon: Mic,       label: translate('voiceReport'),        to: '/report',           color: 'from-pink-500 to-rose-500' },
+    { icon: BarChart3, label: translate('analytics'),           to: '/analytics',        color: 'from-amber-500 to-orange-500' },
+    { icon: Trophy,    label: translate('leaderboard'),         to: '/leaderboard',      color: 'from-emerald-500 to-green-500' },
+    { icon: MessageSquare, label: translate('aiAssistant'),    to: '/assistant',        color: 'from-violet-500 to-purple-500' },
+    { icon: Building2, label: translate('govSchemes'),         to: '/government',          color: 'from-blue-500 to-cyan-500' },
+  ];
 
   const [myIssues, setMyIssues] = useState<CommunityIssue[]>([]);
   const [recentIssues, setRecentIssues] = useState<CommunityIssue[]>([]);
@@ -193,7 +197,7 @@ export default function CommunityDashboard() {
               className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 px-4 py-2 rounded-full text-sm font-medium hover:from-indigo-400 hover:to-purple-500 transition-all"
             >
               <Plus className="w-4 h-4" />
-              Report Issue
+              {translate('reportIssue')}
             </Link>
             <button
               onClick={() => signOut().then(() => navigate('/'))}
@@ -214,7 +218,7 @@ export default function CommunityDashboard() {
           className="mb-8"
         >
           <h1 className="text-3xl font-bold mb-1">
-            Welcome, {profile?.name || user?.email?.split('@')[0] || 'Hero'} 👋
+            {translate('welcomeHero')}, {profile?.name || user?.email?.split('@')[0] || 'Hero'} 👋
           </h1>
           <p className="text-white/40">
             You have {profile?.points || 0} points · {myIssues.length} issues reported
@@ -224,10 +228,10 @@ export default function CommunityDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Total Issues', value: stats.totalIssues, icon: FileText, color: 'text-blue-400' },
-            { label: 'Resolved', value: stats.resolvedIssues, icon: CheckCircle2, color: 'text-emerald-400' },
-            { label: 'Resolution Rate', value: `${resolutionRate}%`, icon: TrendingUp, color: 'text-amber-400' },
-            { label: 'Active Citizens', value: stats.activeUsers, icon: Users, color: 'text-purple-400' },
+            { label: translate('totalIssues'), value: stats.totalIssues, icon: FileText, color: 'text-blue-400' },
+            { label: translate('resolved'), value: stats.resolvedIssues, icon: CheckCircle2, color: 'text-emerald-400' },
+            { label: translate('resolutionRate'), value: `${resolutionRate}%`, icon: TrendingUp, color: 'text-amber-400' },
+            { label: translate('activeCitizens'), value: stats.activeUsers, icon: Users, color: 'text-purple-400' },
           ].map((stat, i) => (
             <motion.div
               key={i}
@@ -245,7 +249,7 @@ export default function CommunityDashboard() {
 
         {/* Quick Actions */}
         <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+          <h2 className="text-lg font-semibold mb-4">{translate('quickActions')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {quickActions.map((action, i) => (
               <Link
@@ -266,7 +270,7 @@ export default function CommunityDashboard() {
           {/* Recent Issues */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Recent Issues</h2>
+              <h2 className="text-lg font-semibold">{translate('recentIssues')}</h2>
               <Link to="/issues" className="text-sm text-indigo-400 hover:text-indigo-300">View All →</Link>
             </div>
             {recentIssues.length === 0 ? (

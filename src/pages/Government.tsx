@@ -25,11 +25,6 @@ const Government = () => {
       .catch(console.error);
   }, []);
 
-  const toggleContrast = () => {
-    setIsHighContrast(!isHighContrast);
-    document.documentElement.classList.toggle('high-contrast');
-  };
-
   const schemes = [
     {
       title: "PM-KISAN",
@@ -177,7 +172,7 @@ const Government = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${isHighContrast ? 'high-contrast' : ''}`}>
-      <Header toggleContrast={toggleContrast} isHighContrast={isHighContrast} />
+      <Header />
       
       <main className="flex-grow bg-gradient-to-b from-green-50 to-white dark:from-gray-900 dark:to-gray-800">
         {/* Hero Section */}
