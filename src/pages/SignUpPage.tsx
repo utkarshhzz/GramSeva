@@ -7,6 +7,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shield, Mail, Lock, User, Phone, MapPin, Loader2, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/FirebaseAuthContext';
+import { Canvas } from '@react-three/fiber';
+import ParticleSphere3D from '@/components/ParticleSphere3D';
+import gsap from 'gsap';
+import { useEffect, useRef } from 'react';
 
 // Google icon SVG
 const GoogleIcon = () => (
@@ -21,6 +25,17 @@ const GoogleIcon = () => (
 export default function SignUpPage() {
   const navigate = useNavigate();
   const { signUp, signInWithGoogle } = useAuth();
+  
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (formRef.current) {
+      gsap.fromTo(formRef.current.children, 
+        { y: 30, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.05, ease: 'power3.out' }
+      );
+    }
+  }, []);
 
   const [name, setName]         = useState('');
   const [email, setEmail]       = useState('');
@@ -72,35 +87,39 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#06060a] text-white flex">
-      {/* Left decorative panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 via-purple-600/10 to-transparent" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/3 w-72 h-72 bg-purple-600/15 rounded-full blur-[100px]" />
+    <div className="min-h-screen bg-background text-white flex">
+      {/* Left decorative panel (3D) */}
+      <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden bg-black">
+        <div className="absolute inset-0 z-0">
+          <Canvas camera={{ position: [0, 0, 3] }}>
+            <ParticleSphere3D />
+          </Canvas>
+        </div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/3 w-72 h-72 bg-amber-600/15 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="relative z-10 text-center px-12">
-          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-8">
-            <Shield className="w-10 h-10 text-white" />
+        <div className="relative z-10 text-center px-12 pointer-events-none">
+          <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(234,179,8,0.3)]">
+            <Shield className="w-10 h-10 text-black" />
           </div>
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-amber-200 bg-clip-text text-transparent">
             Become A Hero
           </h2>
-          <p className="text-white/40 text-lg max-w-md">
+          <p className="text-white/60 text-lg max-w-md mx-auto">
             Join GramSahay and help build a better community. Every report counts.
           </p>
           <div className="mt-8 flex justify-center gap-8 text-center">
             <div>
-              <p className="text-2xl font-bold text-indigo-400">15K+</p>
-              <p className="text-xs text-white/30">Issues Reported</p>
+              <p className="text-2xl font-bold text-primary">15K+</p>
+              <p className="text-xs text-white/50">Issues Reported</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-emerald-400">95%</p>
-              <p className="text-xs text-white/30">Resolution Rate</p>
+              <p className="text-xs text-white/50">Resolution Rate</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-amber-400">850+</p>
-              <p className="text-xs text-white/30">Communities</p>
+              <p className="text-xs text-white/50">Communities</p>
             </div>
           </div>
         </div>
@@ -108,15 +127,11 @@ export default function SignUpPage() {
 
       {/* Right form panel */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
+        <div ref={formRef} className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center justify-center gap-2 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-600 to-yellow-400 flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.3)]">
+              <Shield className="w-5 h-5 text-black" />
             </div>
             <span className="text-2xl font-bold">GramSahay</span>
           </div>
@@ -124,7 +139,7 @@ export default function SignUpPage() {
           <h1 className="text-3xl font-bold mb-2">Create Account</h1>
           <p className="text-white/40 mb-8">
             Already have an account?{' '}
-            <Link to="/sign-in" className="text-indigo-400 hover:text-indigo-300 transition-colors">
+            <Link to="/sign-in" className="text-primary hover:text-primary/80 transition-colors">
               Sign in
             </Link>
           </p>
@@ -163,7 +178,7 @@ export default function SignUpPage() {
                   onChange={e => setName(e.target.value)}
                   required
                   placeholder="Your full name"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -178,7 +193,7 @@ export default function SignUpPage() {
                   onChange={e => setEmail(e.target.value)}
                   required
                   placeholder="you@example.com"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -193,7 +208,7 @@ export default function SignUpPage() {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="+91 98765..."
-                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                   />
                 </div>
               </div>
@@ -204,7 +219,7 @@ export default function SignUpPage() {
                   value={ward}
                   onChange={e => setWard(e.target.value)}
                   placeholder="Ward 12"
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -219,7 +234,7 @@ export default function SignUpPage() {
                   onChange={e => setLocation(e.target.value)}
                   required
                   placeholder="Your city or village"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -235,7 +250,7 @@ export default function SignUpPage() {
                   required
                   minLength={6}
                   placeholder="Min 6 characters"
-                  className="w-full pl-11 pr-11 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                  className="w-full pl-11 pr-11 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 />
                 <button
                   type="button"
@@ -250,7 +265,7 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 font-medium hover:from-indigo-400 hover:to-purple-500 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 mt-6"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold hover:brightness-110 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-yellow-500/25 mt-6"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -262,7 +277,7 @@ export default function SignUpPage() {
               )}
             </button>
           </form>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

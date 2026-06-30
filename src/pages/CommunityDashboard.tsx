@@ -4,7 +4,11 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { useRef } from 'react';
+import { Canvas } from '@react-three/fiber';
+import ParticleSphere3D from '@/components/ParticleSphere3D';
 import {
   MapPin, Plus, BarChart3, Trophy, Users, MessageSquare,
   Shield, ArrowUp, Clock, TrendingUp, AlertTriangle,
@@ -54,9 +58,21 @@ export default function CommunityDashboard() {
   const [loading, setLoading] = useState(true);
   const [insightsLoading, setInsightsLoading] = useState(false);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     loadData();
   }, [user]);
+
+  useEffect(() => {
+    if (!loading && containerRef.current) {
+      gsap.fromTo(
+        containerRef.current.children,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out' }
+      );
+    }
+  }, [loading]);
 
   const loadData = async () => {
     setLoading(true);
@@ -121,6 +137,7 @@ export default function CommunityDashboard() {
           description: "People are dumping garbage in the empty plot next to the school. The smell is unbearable.",
           category: "sanitation" as any,
           severity: "critical" as any,
+          status: "resolved" as any,
           location: { lat: 22.5937 + (Math.random() - 0.5) * 0.05, lng: 78.9629 + (Math.random() - 0.5) * 0.05 },
           address: "Plot 42, School Lane",
           aiComplaintDraft: "To the Municipal Corporation Sanitation Department,\n\nSubject: Critical - Illegal Garbage Dumping Next to School in Plot 42\n\nRespected Sir/Madam,\n\nI am writing to file a formal complaint regarding the rampant and illegal dumping of garbage in the empty plot (Plot 42) situated directly adjacent to the local school on School Lane. The accumulated waste has created an unbearable stench and is rapidly becoming a serious health hazard for the students and nearby residents.\n\nThis unhygienic environment is attracting stray animals, flies, and mosquitoes, directly threatening the health and well-being of young children attending the school daily. This violation of public health standards requires immediate intervention.\n\nI urge the municipal authorities to clear the accumulated garbage without delay, sanitize the area, and implement measures (such as warning signs or penalizing offenders) to prevent future dumping at this site. Protecting the health of our students must be a priority.\n\nThank you for your immediate action.\n\nYours faithfully,\nConcerned Citizen",
@@ -136,7 +153,7 @@ export default function CommunityDashboard() {
           description: issue.description,
           category: issue.category,
           severity: issue.severity,
-          status: 'reported',
+          status: issue.status || 'reported',
           location: issue.location,
           address: issue.address,
           ward: 'Demo Ward',
@@ -147,8 +164,8 @@ export default function CommunityDashboard() {
           aiSuggestions: ['Dispatch team immediately', 'Assess damage', 'Inform community'],
           aiAuthority: 'Local Municipal Corporation',
           aiComplaintDraft: issue.aiComplaintDraft,
-          acknowledgedAt: null,
-          resolvedAt: null,
+          acknowledgedAt: issue.status === 'in-progress' || issue.status === 'resolved' ? new Date().toISOString() : null,
+          resolvedAt: issue.status === 'resolved' ? new Date().toISOString() : null,
         });
       }
       await loadData();
@@ -176,8 +193,16 @@ export default function CommunityDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#06060a] text-white">
-      {/* Header */}
+    <div className="min-h-screen bg-background text-white relative overflow-hidden">
+      {/* 3D Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+        <Canvas camera={{ position: [0, 0, 5] }}>
+          <ParticleSphere3D />
+        </Canvas>
+      </div>
+
+      <div className="relative z-10">
+        {/* Header */}
       <div className="sticky top-0 z-50 backdrop-blur-xl bg-[#050505]/80 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
@@ -211,7 +236,7 @@ export default function CommunityDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div ref={containerRef} className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         {/* Welcome */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -241,7 +266,7 @@ export default function CommunityDashboard() {
               transition={{ delay: i * 0.1, type: 'spring', stiffness: 100 }}
               whileHover={{ scale: 1.05, rotateX: 5, rotateY: 5, zIndex: 10 }}
               style={{ transformPerspective: 1000 }}
-              className="p-6 rounded-3xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.15)] transition-all duration-300"
+              className="p-6 rounded-3xl bg-card border border-white/10 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.15)] transition-all duration-300"
             >
               <stat.icon className={`w-5 h-5 ${stat.color} mb-3`} />
               <p className="text-3xl font-bold text-white tracking-tight">{stat.value}</p>
@@ -258,7 +283,7 @@ export default function CommunityDashboard() {
               <motion.div key={i} whileHover={{ scale: 1.05, rotateX: -5, rotateY: 5 }} style={{ transformPerspective: 800 }}>
                 <Link
                   to={action.to}
-                  className="block group p-5 rounded-3xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/50 transition-all text-center shadow-sm hover:shadow-[0_0_25px_rgba(234,179,8,0.2)] h-full"
+                  className="block group p-5 rounded-3xl bg-card border border-white/10 hover:border-primary/50 transition-all text-center shadow-sm hover:shadow-[0_0_25px_rgba(234,179,8,0.2)] h-full"
                 >
                   <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-inner`}>
                     <action.icon className="w-6 h-6 text-black" />
@@ -311,7 +336,7 @@ export default function CommunityDashboard() {
                   >
                     <Link
                       to={`/issues/${issue.id}`}
-                      className="block p-5 rounded-2xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/30 transition-all shadow-lg hover:shadow-[0_0_20px_rgba(234,179,8,0.1)] group"
+                      className="block p-5 rounded-2xl bg-card border border-white/10 hover:border-primary/30 transition-all shadow-lg hover:shadow-[0_0_20px_rgba(234,179,8,0.1)] group"
                     >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -364,7 +389,7 @@ export default function CommunityDashboard() {
             </div>
 
             {/* AI Insights */}
-            <div className="p-5 rounded-2xl bg-[#0a0a0a] border border-white/10 hover:border-yellow-500/30 transition-colors">
+            <div className="p-5 rounded-2xl bg-card border border-white/10 hover:border-primary/30 transition-colors">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium flex items-center gap-2 text-yellow-500">
                   <Sparkles className="w-4 h-4" />
@@ -433,6 +458,7 @@ export default function CommunityDashboard() {
       
       {/* Floating Chatbot */}
       <FloatingChatbot />
+      </div>
     </div>
   );
 }

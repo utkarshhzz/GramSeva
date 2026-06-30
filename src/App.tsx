@@ -2,7 +2,8 @@
 // GramSahay — Main App Router
 // ============================================================
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider, useAuth } from '@/contexts/FirebaseAuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -23,6 +24,15 @@ import AIAssistant from '@/pages/AIAssistant';
 import NotFound from '@/pages/NotFound';
 // Keep the government schemes page — it's relevant
 import Government from '@/pages/Government';
+
+// ── Scroll To Top ──────────────────────────────────────────────
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 // ── Protected Route wrapper ──────────────────────────────────
 
@@ -74,6 +84,7 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <LanguageProvider>
           <div className="flex flex-col min-h-screen w-full">
