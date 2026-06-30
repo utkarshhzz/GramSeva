@@ -1,5 +1,6 @@
 // ============================================================
 // GramSahay — Firebase Auth Context
+// Supports: Email/Password + Google Sign-In
 // ============================================================
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -7,11 +8,12 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
   updateProfile,
   type User,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, googleProvider } from '@/lib/firebase';
 import { createUserProfile, getUserProfile } from '@/lib/firestore';
 import type { CommunityUser } from '@/types/community';
 
@@ -28,6 +30,7 @@ interface AuthContextType {
     location: string;
     ward?: string;
   }) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -39,13 +42,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<CommunityUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Listen to Firebase auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        const p = await getUserProfile(firebaseUser.uid);
-        setProfile(p);
+        try {
+          const p = await getUserProfile(firebaseUser.uid);
+          setProfile(p);
+        } catch (e) {
+          console.error('Failed to load profile:', e);
+          setProfile(null);
+        }
       } else {
         setProfile(null);
       }
@@ -69,11 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ward?: string;
   }) => {
     const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
-
-    // Set display name
     await updateProfile(cred.user, { displayName: data.name });
-
-    // Create Firestore profile
     const p = await createUserProfile(cred.user.uid, {
       name: data.name,
       email: data.email,
@@ -81,6 +84,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       location: data.location,
       ward: data.ward,
     });
+    setProfile(p);
+  };
+
+  const signInWithGoogle = async () => {
+    const cred = await signInWithPopup(auth, googleProvider);
+    // Check if profile already exists, if not create one
+    let p = await getUserProfile(cred.user.uid);
+    if (!p) {
+      p = await createUserProfile(cred.user.uid, {
+        name: cred.user.displayName || 'Community Member',
+        email: cred.user.email || '',
+        phone: cred.user.phoneNumber || '',
+        location: '',
+        ward: '',
+      });
+    }
     setProfile(p);
   };
 
@@ -99,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, profile, loading, signIn, signUp, signOut, refreshProfile }}
+      value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>
