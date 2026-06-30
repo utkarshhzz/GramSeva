@@ -21,6 +21,7 @@ import {
   increment,
   serverTimestamp,
   Timestamp,
+  setDoc,
   type DocumentData,
   type QueryDocumentSnapshot,
 } from 'firebase/firestore';
@@ -84,9 +85,7 @@ export async function createUserProfile(
     updatedAt: now,
   };
 
-  await import('firebase/firestore').then(({ setDoc }) =>
-    setDoc(doc(db, COLLECTIONS.USERS, uid), profile)
-  );
+  await setDoc(doc(db, COLLECTIONS.USERS, uid), profile);
 
   return profile;
 }
