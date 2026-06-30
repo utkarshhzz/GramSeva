@@ -20,6 +20,7 @@ import { getIssue, toggleVote, hasUserVoted, addComment, getComments, updateIssu
 import { CATEGORIES, SEVERITIES, STATUSES } from '@/types/community';
 import type { CommunityIssue, IssueComment } from '@/types/community';
 import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   roads: Construction, water: Droplets, electricity: Zap,
@@ -56,6 +57,7 @@ export default function IssueDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
+  const { translate } = useLanguage();
 
   const [issue, setIssue] = useState<CommunityIssue | null>(null);
   const [comments, setComments] = useState<IssueComment[]>([]);
@@ -154,8 +156,8 @@ export default function IssueDetail() {
     return (
       <div className="min-h-screen bg-[#06060a] text-white flex flex-col items-center justify-center gap-4">
         <AlertTriangle className="w-10 h-10 text-amber-400" />
-        <p className="text-white/60">Issue not found</p>
-        <Link to="/issues" className="text-indigo-400 hover:text-indigo-300">← Back to Issues</Link>
+        <p className="text-white/60">{translate('issueNotFound')}</p>
+        <Link to="/issues" className="text-indigo-400 hover:text-indigo-300">← {translate('backToIssues')}</Link>
       </div>
     );
   }
@@ -172,7 +174,7 @@ export default function IssueDetail() {
         <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
           <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
-            Back
+            {translate('back')}
           </button>
           <div className="flex items-center gap-3">
             <div className="dark">
@@ -213,7 +215,7 @@ export default function IssueDetail() {
 
             {/* Meta */}
             <div className="flex items-center gap-4 text-sm text-white/40">
-              <span>Reported by <span className="text-white/60">{issue.reporterName}</span></span>
+              <span>{translate('reportedBy')} <span className="text-white/60">{issue.reporterName}</span></span>
               <span className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
                 {timeAgo(issue.createdAt)}
@@ -268,7 +270,7 @@ export default function IssueDetail() {
               <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 space-y-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-indigo-400" />
-                  <span className="font-medium text-indigo-300">AI Analysis</span>
+                  <span className="font-medium text-indigo-300">{translate('aiAnalysis')}</span>
                 </div>
 
                 {issue.aiSummary && (
@@ -277,14 +279,14 @@ export default function IssueDetail() {
 
                 {issue.aiAuthority && (
                   <div>
-                    <p className="text-xs text-white/30 mb-1">Responsible Authority</p>
+                    <p className="text-xs text-white/30 mb-1">{translate('responsibleAuthority')}</p>
                     <p className="text-sm text-white/80">{issue.aiAuthority}</p>
                   </div>
                 )}
 
                 {issue.aiSuggestions?.length > 0 && (
                   <div>
-                    <p className="text-xs text-white/30 mb-2">Suggestions</p>
+                    <p className="text-xs text-white/30 mb-2">{translate('suggestions')}</p>
                     <ul className="space-y-1.5">
                       {issue.aiSuggestions.map((s, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-white/60">
@@ -303,7 +305,7 @@ export default function IssueDetail() {
                       className="flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
                     >
                       <ChevronRight className={`w-4 h-4 transition-transform ${showComplaint ? 'rotate-90' : ''}`} />
-                      Formal Complaint Draft
+                      {translate('formalComplaintDraft')}
                     </button>
                     {showComplaint && (
                       <motion.div
@@ -332,7 +334,7 @@ export default function IssueDetail() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-white/40" />
-                Comments ({comments.length})
+                {translate('comments')} ({comments.length})
               </h2>
 
               {/* Add comment */}
@@ -347,7 +349,7 @@ export default function IssueDetail() {
                       value={newComment}
                       onChange={e => setNewComment(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleAddComment()}
-                      placeholder="Add a comment..."
+                      placeholder={translate('addComment')}
                       className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-indigo-500/50 text-sm"
                     />
                     <button
@@ -363,7 +365,7 @@ export default function IssueDetail() {
 
               {/* Comments list */}
               {comments.length === 0 ? (
-                <p className="text-sm text-white/20 text-center py-6">No comments yet. Be the first to comment!</p>
+                <p className="text-sm text-white/20 text-center py-6">{translate('noCommentsYet')}</p>
               ) : (
                 <div className="space-y-4">
                   {comments.map(comment => (
@@ -404,18 +406,18 @@ export default function IssueDetail() {
               >
                 <ArrowUp className="w-8 h-8" />
                 <span className="text-2xl font-bold">{voteCount}</span>
-                <span className="text-xs">{voted ? 'You upvoted' : 'Upvote this issue'}</span>
+                <span className="text-xs">{voted ? translate('youUpvoted') : translate('upvoteThisIssue')}</span>
               </button>
             </div>
 
             {/* Status card */}
             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-              <h3 className="text-sm font-medium text-white/60 mb-3">Status Timeline</h3>
+              <h3 className="text-sm font-medium text-white/60 mb-3">{translate('statusTimeline')}</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full bg-blue-500" />
                   <div>
-                    <p className="text-sm text-white/70">Reported</p>
+                    <p className="text-sm text-white/70">{translate('reportedStatus')}</p>
                     <p className="text-xs text-white/20">{new Date(issue.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
@@ -423,7 +425,7 @@ export default function IssueDetail() {
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-purple-500" />
                     <div>
-                      <p className="text-sm text-white/70">Acknowledged</p>
+                      <p className="text-sm text-white/70">{translate('acknowledgedStatus')}</p>
                       <p className="text-xs text-white/20">{new Date(issue.acknowledgedAt).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -432,7 +434,7 @@ export default function IssueDetail() {
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-emerald-500" />
                     <div>
-                      <p className="text-sm text-white/70">Resolved</p>
+                      <p className="text-sm text-white/70">{translate('resolvedStatus')}</p>
                       <p className="text-xs text-white/20">{new Date(issue.resolvedAt).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -451,7 +453,7 @@ export default function IssueDetail() {
                 }`}
               >
                 <HeartHandshake className="w-5 h-5" />
-                {hasVolunteered ? "You're volunteering for this!" : "Volunteer to Help"}
+                {hasVolunteered ? translate('youAreVolunteering') : translate('volunteerToHelp')}
               </button>
 
               <a 
@@ -461,7 +463,7 @@ export default function IssueDetail() {
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-all border border-[#25D366]/30"
               >
                 <MessageCircle className="w-5 h-5" />
-                Rally Community (WhatsApp)
+                {translate('rallyCommunity')}
               </a>
 
               <a 
@@ -469,29 +471,29 @@ export default function IssueDetail() {
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all border border-red-500/30"
               >
                 <Mail className="w-5 h-5" />
-                Escalate to Authority (Email)
+                {translate('escalateToAuthority')}
               </a>
             </div>
 
             {/* Quick stats */}
             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-              <h3 className="text-sm font-medium text-white/60 mb-3">Quick Info</h3>
+              <h3 className="text-sm font-medium text-white/60 mb-3">{translate('quickInfo')}</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-white/30">Category</span>
+                  <span className="text-white/30">{translate('category')}</span>
                   <span className={categoryMeta?.color}>{categoryMeta?.label}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/30">Severity</span>
+                  <span className="text-white/30">{translate('severity')}</span>
                   <span className={severityMeta?.color}>{severityMeta?.label}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/30">Comments</span>
+                  <span className="text-white/30">{translate('comments')}</span>
                   <span className="text-white/60">{comments.length}</span>
                 </div>
                 {issue.ward && (
                   <div className="flex justify-between">
-                    <span className="text-white/30">Ward</span>
+                    <span className="text-white/30">{translate('ward')}</span>
                     <span className="text-white/60">{issue.ward}</span>
                   </div>
                 )}

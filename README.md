@@ -18,11 +18,20 @@ Indian villages and urban wards face countless daily issues — broken roads, wa
 ## 🚀 Key Features
 
 ### 🤖 Agentic AI (Google Gemini)
-- **AI Issue Classification**: Automatically categorizes issues, assesses severity, and identifies the responsible government authority
-- **AI Formal Complaint Draft**: Generates professional complaint letters addressed to the right department
-- **AI Community Insights**: Analyzes patterns and generates actionable community health reports
-- **AI Chat Assistant**: Conversational help for navigating government processes, schemes, and platform features
-- **Voice-First Reporting**: Speak in Hindi, English, or Kannada — AI transcribes and classifies automatically
+- **AI Issue Classification**: Automatically categorizes issues, assesses severity, and identifies the responsible government authority.
+- **AI Formal Complaint Draft**: Generates professional, formal complaint letters addressed to the right department.
+- **AI Community Insights**: Analyzes patterns and generates actionable community health reports.
+- **AI Chat Assistant**: Conversational help for navigating government processes, schemes, and platform features.
+- **Voice-First Reporting**: Speak in Hindi, English, or Kannada — AI transcribes and classifies automatically.
+
+### 🌍 Accessibility & Inclusivity
+- **Progressive Web App (PWA)**: Installable on any mobile device. Works offline or in low-network areas.
+- **Multilingual Support**: Real-time UI translation across English, Hindi (हिंदी), and Kannada (ಕನ್ನಡ) for all major components.
+- **Voice Features**: Allowing non-technical or illiterate citizens to report issues effortlessly.
+
+### 📱 Action & Escalation
+- **WhatsApp Community Rally**: One-click sharing to local WhatsApp groups to rally upvotes and community support.
+- **One-Click Email Escalation**: Automatically generates and opens an email client with the AI-drafted complaint to send directly to local authorities.
 
 ### 📍 Issue Reporting System
 - Photo upload with multiple images
@@ -59,15 +68,15 @@ Indian villages and urban wards face countless daily issues — broken roads, wa
 
 | Component | Technology |
 |-----------|-----------|
-| **Frontend** | React 18, TypeScript, Vite |
+| **Frontend** | React 18, TypeScript, Vite, PWA Plugin |
 | **UI/Design** | Tailwind CSS, shadcn/ui, Framer Motion |
 | **AI Engine** | Google Gemini 2.0 Flash (via Google AI Studio) |
 | **Authentication** | Firebase Authentication |
 | **Database** | Cloud Firestore |
 | **File Storage** | Firebase Storage |
-| **Maps** | Pigeon Maps |
+| **Maps** | React-Leaflet / OpenStreetMap |
 | **Charts** | Recharts |
-| **Deployment** | Google Cloud Run (Docker) |
+| **Deployment** | Firebase Hosting |
 
 ### Google Tools Used
 - ✅ Google Gemini AI (via Google AI Studio)
@@ -127,16 +136,14 @@ Open **http://localhost:8080**
 
 ---
 
-## ☁️ Deployment (Google Cloud Run)
+## ☁️ Deployment (Firebase Hosting)
 
 ```bash
-# Build and deploy
-gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/gramsahay
-gcloud run deploy gramsahay \
-  --image gcr.io/YOUR_PROJECT_ID/gramsahay \
-  --platform managed \
-  --region asia-south1 \
-  --allow-unauthenticated
+# Build the project
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy --only hosting
 ```
 
 ---
