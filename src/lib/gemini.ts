@@ -53,7 +53,7 @@ export async function classifyIssue(
 ): Promise<AIClassificationResult> {
   try {
     const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const userMessage = `Issue Title: ${title}
 Issue Description: ${description}
@@ -132,7 +132,7 @@ export async function generateCommunityInsights(
 ): Promise<AICommunityInsight[]> {
   try {
     const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Prepare a summary of issues for the AI
     const issueSummary = issues.slice(0, 50).map(i => ({
@@ -203,7 +203,7 @@ export async function processVoiceReport(
 ): Promise<{ title: string; description: string; category: IssueCategory; severity: IssueSeverity }> {
   try {
     const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const result = await model.generateContent([
       { text: VOICE_PROMPT },
@@ -251,17 +251,16 @@ export async function chatWithAssistant(
 ): Promise<string> {
   try {
     const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = ai.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      systemInstruction: CHAT_SYSTEM_PROMPT,
+    });
 
     const chat = model.startChat({
-      history: [
-        { role: 'user', parts: [{ text: 'Initialize' }] },
-        { role: 'model', parts: [{ text: CHAT_SYSTEM_PROMPT }] },
-        ...history.map(h => ({
-          role: h.role as 'user' | 'model',
-          parts: [{ text: h.text }],
-        })),
-      ],
+      history: history.map(h => ({
+        role: h.role as 'user' | 'model',
+        parts: [{ text: h.text }],
+      })),
     });
 
     const result = await chat.sendMessage(message);
